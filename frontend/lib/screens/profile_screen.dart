@@ -134,9 +134,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: [
                               const Icon(Icons.phone_outlined, color: AppColors.textSecondary, size: 13),
                               const SizedBox(width: 4),
-                              Text(
-                                _phone.isNotEmpty ? _phone : 'No phone set',
-                                style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12),
+                              Expanded(
+                                child: Text(
+                                  _phone.isNotEmpty ? _phone : 'No phone set',
+                                  style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
@@ -155,7 +158,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Emergency & Medical Section
               Row(
                 children: [
-                  Text('Emergency & Medical...', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                  Expanded(
+                    child: Text('Emergency & Medical...', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                  ),
                   const SizedBox(width: 8),
                   const Icon(Icons.edit, color: AppColors.neonCyan, size: 16),
                   const SizedBox(width: 4),

@@ -64,20 +64,24 @@ class _SupportScreenState extends State<SupportScreen> {
               // Helplines Header
               Row(
                 children: [
-                  Text("24/7 Rapid Response Helplines ", style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                  Expanded(
+                    child: Text("24/7 Rapid Response Helplines ", style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                  ),
                   const Icon(Icons.phone, color: AppColors.neonCyan, size: 18),
                 ],
               ),
               const SizedBox(height: 14),
 
               // Helpline Cards Grid
-              GridView.count(
+              GridView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.3,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 130, // Fixed height to prevent overflow
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                ),
                 children: [
                   HelplineCard(number: '1091', title: 'Women Helpline', subtitle: 'National Support', accentColor: AppColors.neonGreen, onCall: () => _dial('1091')),
                   HelplineCard(number: '181', title: 'Abuse Helpline', subtitle: 'Domestic Support', accentColor: AppColors.neonPurple, onCall: () => _dial('181')),
@@ -90,7 +94,9 @@ class _SupportScreenState extends State<SupportScreen> {
               // Activity Logs Header
               Row(
                 children: [
-                  Text('AI Protection Activity Logs ', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                  Expanded(
+                    child: Text('AI Protection Activity Logs ', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                  ),
                   const Icon(Icons.description, color: Colors.amber, size: 18),
                 ],
               ),

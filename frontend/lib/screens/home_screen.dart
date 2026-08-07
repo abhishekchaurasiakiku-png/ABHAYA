@@ -48,31 +48,39 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hello, $_userName ✨',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hello, $_userName ✨',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                            width: 8, height: 8,
-                            decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.neonGreen),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Shield Active & Monitoring',
-                            style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13),
-                          ),
-                        ],
-                      ),
-                    ],
+                        Row(
+                          children: [
+                            Container(
+                              width: 8, height: 8,
+                              decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.neonGreen),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'Shield Active & Monitoring',
+                                style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -143,8 +151,10 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 24),
 
               // Quick Actions Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              Wrap(
+                alignment: WrapAlignment.spaceAround,
+                spacing: 8,
+                runSpacing: 16,
                 children: [
                   QuickActionButton(
                     icon: Icons.phone,
@@ -180,13 +190,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 14),
-              GridView.count(
+              GridView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.5,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 130, // Fixed height to prevent overflow
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                ),
                 children: [
                   SafetyToolkitTile(
                     icon: Icons.my_location,
