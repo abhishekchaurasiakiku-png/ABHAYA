@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+.env
+.env.production
+.git
+.gitignore
+*.md
+uploads/*
+!uploads/.gitkeep
+.vscode
+.idea

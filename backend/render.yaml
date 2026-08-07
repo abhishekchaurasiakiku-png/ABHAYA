@@ -1,0 +1,30 @@
+# SafeHer-AI Backend — Render Deployment Blueprint
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: safeher-ai-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        sync: false # Set manually in Render dashboard — use MongoDB Atlas URI
+      - key: JWT_SECRET
+        generateValue: true # Auto-generate a secure random secret
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 30d
+      - key: UPLOAD_DIR
+        value: ./uploads
+      - key: MAX_FILE_SIZE
+        value: 10485760
+      - key: CORS_ORIGIN
+        sync: false # Set to your frontend domain if deploying web version
