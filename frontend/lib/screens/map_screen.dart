@@ -27,7 +27,7 @@ class _MapScreenState extends State<MapScreen> {
   String _riskLabel = 'Low Risk (94% Safe)';
   Color _riskColor = AppColors.neonGreen;
   String _geofenceLabel = 'GEOFENCE: SAFE ZONE';
-  List<LatLng> _policeStations = [];
+  List<PoliceStation> _policeStations = [];
   List<LatLng> _routePoints = [];
 
   @override
@@ -91,7 +91,7 @@ class _MapScreenState extends State<MapScreen> {
         _isLoading = false;
       });
       if (stations.isNotEmpty) {
-        _calculateRouteTo(stations.first);
+        _calculateRouteTo(stations.first.location);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No police stations found nearby')));
       }
@@ -205,18 +205,30 @@ class _MapScreenState extends State<MapScreen> {
                               ),
                             ),
                             ..._policeStations.map((station) => Marker(
-                                  point: station,
-                                  width: 40,
-                                  height: 40,
+                                  point: station.location,
+                                  width: 150, // wide enough to contain text
+                                  height: 60,
                                   child: GestureDetector(
-                                    onTap: () => _calculateRouteTo(station),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.blue.withValues(alpha: 0.8),
-                                        border: Border.all(color: Colors.white, width: 2),
-                                      ),
-                                      child: const Icon(Icons.local_police, color: Colors.white, size: 20),
+                                    onTap: () {
+                                      _calculateRouteTo(station.location);
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Routing to: ${station.name} (${(station.distance/1000).toStringAsFixed(1)}km)')));
+                                    },
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.withValues(alpha: 0.9),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            station.name.length > 15 ? '${station.name.substring(0, 15)}...' : station.name,
+                                            style: GoogleFonts.poppins(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        const Icon(Icons.local_police, color: Colors.blue, size: 28),
+                                      ],
                                     ),
                                   ),
                                 )),

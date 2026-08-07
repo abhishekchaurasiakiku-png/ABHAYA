@@ -16,8 +16,10 @@ import '../widgets/safety_toolkit_tile.dart';
 import '../services/user_service.dart';
 import '../services/sos_service.dart';
 import '../services/location_service.dart';
+import '../services/api_service.dart';
 import 'map_screen.dart';
 import 'trip_monitor_screen.dart';
+import 'incident_history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -286,7 +288,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Incident History',
                     subtitle: 'View security logs',
                     iconColor: AppColors.neonGreen,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const IncidentHistoryScreen()),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -374,6 +381,12 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Live location sent via Email/SMS!')),
+        );
+      }
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
         );
       }
     } catch (e) {

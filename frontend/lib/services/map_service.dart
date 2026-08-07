@@ -2,10 +2,18 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
+class PoliceStation {
+  final LatLng location;
+  final String name;
+  final double distance;
+
+  PoliceStation(this.location, this.name, this.distance);
+}
+
 class MapService {
-  // Fetch nearby police stations using Overpass API
-  Future<List<LatLng>> getNearbyPoliceStations(double lat, double lon) async {
-    const double radius = 5000; // 5km
+  // Fetch nearby police stations using Overpass API (top 3, max 4km)
+  Future<List<PoliceStation>> getNearbyPoliceStations(double lat, double lon) async {
+    const double radius = 4000; // 4km
     final String query = '''
       [out:json];
       (
@@ -23,15 +31,32 @@ class MapService {
         final data = jsonDecode(response.body);
         final elements = data['elements'] as List;
         
-        List<LatLng> stations = [];
+        List<PoliceStation> stations = [];
+        final distance = const Distance();
+        final currentLoc = LatLng(lat, lon);
+
         for (var el in elements) {
+          LatLng loc;
           if (el['type'] == 'node') {
-            stations.add(LatLng(el['lat'], el['lon']));
+            loc = LatLng(el['lat'], el['lon']);
           } else if (el['center'] != null) {
-            stations.add(LatLng(el['center']['lat'], el['center']['lon']));
+            loc = LatLng(el['center']['lat'], el['center']['lon']);
+          } else {
+            continue;
           }
+          
+          String name = 'Police Station';
+          if (el['tags'] != null && el['tags']['name'] != null) {
+            name = el['tags']['name'];
+          }
+
+          final dist = distance.as(LengthUnit.Meter, currentLoc, loc);
+          stations.add(PoliceStation(loc, name, dist));
         }
-        return stations;
+
+        // Sort by distance and return top 3
+        stations.sort((a, b) => a.distance.compareTo(b.distance));
+        return stations.take(3).toList();
       }
     } catch (e) {
       // Return empty list on failure
