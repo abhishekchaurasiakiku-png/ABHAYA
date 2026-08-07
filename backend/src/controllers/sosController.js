@@ -2,6 +2,40 @@ const Incident = require('../models/Incident');
 const User = require('../models/User');
 const { sendSosNotification } = require('../services/fcmService');
 const { sendSosSms, sendSosEmail } = require('../services/notificationService');
+
+const generateEmailHtml = (user, type, triggerType, mapsUrl) => {
+  const isSos = type === 'SOS';
+  const color = isSos ? '#ff0033' : '#00bfa5';
+  const title = isSos ? '🚨 URGENT SOS ALERT' : '📍 Live Location Shared';
+  
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 2px solid ${color}; border-radius: 10px; overflow: hidden;">
+      <div style="background-color: ${color}; color: white; padding: 15px; text-align: center;">
+        <h2 style="margin: 0;">${title}</h2>
+      </div>
+      <div style="padding: 20px;">
+        <p style="font-size: 16px;"><strong>${user.name}</strong> ${isSos ? 'has triggered an emergency alarm' : 'is sharing their live location with you'}.</p>
+        
+        <h3 style="color: ${color}; border-bottom: 1px solid #ccc; padding-bottom: 5px;">User Condition & Details</h3>
+        <ul style="list-style: none; padding: 0;">
+          ${isSos ? `<li style="margin-bottom: 8px;"><strong>Trigger Reason:</strong> ${triggerType}</li>` : ''}
+          <li style="margin-bottom: 8px;"><strong>Phone Number:</strong> ${user.phone || 'Not provided'}</li>
+          <li style="margin-bottom: 8px;"><strong>Blood Group:</strong> ${user.bloodGroup || 'Not specified'}</li>
+          <li style="margin-bottom: 8px;"><strong>Medical Notes:</strong> ${user.medicalDetails || 'None provided'}</li>
+          <li style="margin-bottom: 8px;"><strong>Home Address:</strong> ${user.homeAddress || 'Not specified'}</li>
+        </ul>
+
+        <div style="text-align: center; margin-top: 25px;">
+          <a href="${mapsUrl}" style="background-color: ${color}; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">View Live Location on Google Maps</a>
+        </div>
+      </div>
+      <div style="background-color: #f4f4f4; padding: 10px; text-align: center; font-size: 12px; color: #666;">
+        SafeHer-AI Automated Emergency System
+      </div>
+    </div>
+  `;
+};
+
 /**
  * POST /api/sos/trigger
  * 
@@ -36,7 +70,7 @@ exports.triggerSos = async (req, res) => {
         : '';
         
       const smsMessage = `SOS ALERT: ${user.name} has triggered an emergency alarm. Last known location: ${mapsUrl}`;
-      const emailHtml = `<h2>SOS ALERT: ${user.name}</h2><p>${user.name} has triggered an emergency alarm.</p><p>Location: <a href="${mapsUrl}">${mapsUrl}</a></p>`;
+      const emailHtml = generateEmailHtml(user, 'SOS', triggerType, mapsUrl);
 
       for (const contact of user.emergencyContacts) {
         if (!contact.notifyOnSos) continue;
@@ -185,7 +219,7 @@ exports.shareLiveLocation = async (req, res) => {
     }
 
     const mapsUrl = `https://maps.google.com/?q=${location.coordinates[1]},${location.coordinates[0]}`;
-    const emailHtml = `<h2>Live Location Update: ${user.name}</h2><p>${user.name} is sharing their live location with you.</p><p>View on Map: <a href="${mapsUrl}">${mapsUrl}</a></p>`;
+    const emailHtml = generateEmailHtml(user, 'SHARE', null, mapsUrl);
     const smsMessage = `${user.name} is sharing their live location: ${mapsUrl}`;
 
     for (const contact of user.emergencyContacts) {
