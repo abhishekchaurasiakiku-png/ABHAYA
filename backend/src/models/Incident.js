@@ -28,6 +28,10 @@ const incidentSchema = new mongoose.Schema({
       required: true,
     },
   },
+  locationHistory: [{
+    coordinates: [Number], // [longitude, latitude]
+    timestamp: { type: Date, default: Date.now },
+  }],
   status: {
     type: String,
     enum: ['Active', 'Resolved', 'False Alarm'],

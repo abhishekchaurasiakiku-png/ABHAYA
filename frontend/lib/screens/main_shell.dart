@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
@@ -17,6 +18,9 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
+  Timer? _sosLocationTimer;
+  String? _activeSosId;
+  bool _isSosActive = false;
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -32,23 +36,51 @@ class _MainShellState extends State<MainShell> {
   }
 
   void _triggerSos() async {
+    if (_isSosActive) {
+      // Resolve SOS
+      _stopLocationTracking();
+      if (_activeSosId != null) {
+        await SosService().resolveSos(_activeSosId!);
+      }
+      setState(() => _isSosActive = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('SOS Resolved. Tracking stopped.', style: GoogleFonts.poppins()),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
+
     final sosService = SosService();
     final locationService = LocationService();
 
     try {
       final position = await locationService.getCurrentLocation();
-      await sosService.triggerSos(
+      final response = await sosService.triggerSos(
         triggerType: 'Manual',
         latitude: position?.latitude ?? 0.0,
         longitude: position?.longitude ?? 0.0,
       );
+      
+      setState(() {
+        _isSosActive = true;
+        _activeSosId = response['_id'];
+      });
+      
+      _startLocationTracking();
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('🚨 EMERGENCY ALERT SENT', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+            content: Text('🚨 EMERGENCY ALERT SENT! LIVE TRACKING ON.', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
             backgroundColor: AppColors.sosPink,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -65,15 +97,45 @@ class _MainShellState extends State<MainShell> {
     }
   }
 
+  void _startLocationTracking() {
+    _sosLocationTimer?.cancel();
+    _sosLocationTimer = Timer.periodic(const Duration(seconds: 15), (timer) async {
+      if (_activeSosId == null) return;
+      try {
+        final position = await LocationService().getCurrentLocation();
+        if (position != null) {
+          await SosService().updateSosLocation(_activeSosId!, position.latitude, position.longitude);
+        }
+      } catch (e) {
+        debugPrint('Live tracking update failed: $e');
+      }
+    });
+  }
+
+  void _stopLocationTracking() {
+    _sosLocationTimer?.cancel();
+    _sosLocationTimer = null;
+    _activeSosId = null;
+  }
+
+  @override
+  void dispose() {
+    _stopLocationTracking();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _currentIndex < 2 ? _currentIndex : _currentIndex - 1 + 2, children: [
-        _screens[0],
-        _screens[1],
-        _screens[3],
-        _screens[4],
-      ]),
+      body: IndexedStack(
+        index: _currentIndex < 2 ? _currentIndex : _currentIndex - 1,
+        children: [
+          _screens[0],
+          _screens[1],
+          _screens[3],
+          _screens[4],
+        ],
+      ),
       extendBody: true,
       floatingActionButton: Container(
         height: 60,
@@ -81,17 +143,19 @@ class _MainShellState extends State<MainShell> {
         margin: const EdgeInsets.only(top: 20),
         child: FloatingActionButton(
           onPressed: _triggerSos,
-          backgroundColor: AppColors.sosPink,
-          elevation: 8,
+          backgroundColor: _isSosActive ? Colors.red[900] : AppColors.sosPink,
+          elevation: _isSosActive ? 12 : 8,
           shape: const CircleBorder(),
-          child: Text(
-            'SOS',
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          child: _isSosActive 
+            ? const Icon(Icons.stop, color: Colors.white, size: 30)
+            : Text(
+                'SOS',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

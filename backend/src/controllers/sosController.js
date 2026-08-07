@@ -1,7 +1,7 @@
 const Incident = require('../models/Incident');
 const User = require('../models/User');
 const { sendSosNotification } = require('../services/fcmService');
-
+const { sendSosSms, sendSosEmail } = require('../services/notificationService');
 /**
  * POST /api/sos/trigger
  * 
@@ -29,26 +29,38 @@ exports.triggerSos = async (req, res) => {
       User.findById(req.userId),
     ]);
 
-    // Dispatch FCM notifications to emergency contacts (non-blocking)
+    // Dispatch notifications to emergency contacts
     if (user && user.emergencyContacts.length > 0) {
-      const notifyPromises = user.emergencyContacts
-        .filter(c => c.notifyOnSos && c.fcmToken)
-        .map(contact =>
+      const mapsUrl = location?.coordinates
+        ? `https://maps.google.com/?q=${location.coordinates[1]},${location.coordinates[0]}`
+        : '';
+        
+      const smsMessage = `SOS ALERT: ${user.name} has triggered an emergency alarm. Last known location: ${mapsUrl}`;
+      const emailHtml = `<h2>SOS ALERT: ${user.name}</h2><p>${user.name} has triggered an emergency alarm.</p><p>Location: <a href="${mapsUrl}">${mapsUrl}</a></p>`;
+
+      for (const contact of user.emergencyContacts) {
+        if (!contact.notifyOnSos) continue;
+        
+        // FCM push
+        if (contact.fcmToken) {
           sendSosNotification(contact.fcmToken, {
             userName: user.name,
             incidentId: savedIncident._id.toString(),
             triggerType,
-            location: location?.coordinates
-              ? `${location.coordinates[1]},${location.coordinates[0]}`
-              : 'Unknown',
-            mapsUrl: location?.coordinates
-              ? `https://maps.google.com/?q=${location.coordinates[1]},${location.coordinates[0]}`
-              : '',
-          }).catch(err => console.error('[SOS] FCM failed for contact:', err.message))
-        );
-
-      // Don't await — fire and forget for speed
-      Promise.all(notifyPromises);
+            mapsUrl,
+          }).catch(err => console.error('[SOS] FCM failed for contact:', err.message));
+        }
+        
+        // SMS
+        if (contact.phone) {
+          sendSosSms(contact.phone, smsMessage);
+        }
+        
+        // Email
+        if (contact.email) {
+          sendSosEmail(contact.email, `URGENT: SOS Alert from ${user.name}`, emailHtml);
+        }
+      }
 
       // Log notified contacts
       savedIncident.notifiedContacts = user.emergencyContacts
@@ -56,7 +68,7 @@ exports.triggerSos = async (req, res) => {
         .map(c => ({
           phone: c.phone,
           notifiedAt: new Date(),
-          method: c.fcmToken ? 'push' : 'sms',
+          method: 'sms', // Simplified since we are now sending via multiple channels
         }));
       await savedIncident.save();
     }
@@ -105,6 +117,37 @@ exports.resolveSos = async (req, res) => {
   } catch (err) {
     console.error('[SOS] Resolve error:', err.message);
     res.status(500).json({ error: 'Failed to resolve SOS' });
+  }
+};
+
+/**
+ * PUT /api/sos/:id/location
+ * Updates real-time location for an active SOS
+ */
+exports.updateLocation = async (req, res) => {
+  try {
+    const { coordinates } = req.body; // [lng, lat]
+    if (!coordinates || coordinates.length !== 2) {
+      return res.status(400).json({ error: 'Invalid coordinates' });
+    }
+
+    const incident = await Incident.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId, status: 'Active' },
+      {
+        $set: { location: { type: 'Point', coordinates } },
+        $push: { locationHistory: { coordinates, timestamp: new Date() } }
+      },
+      { new: true }
+    );
+
+    if (!incident) {
+      return res.status(404).json({ error: 'Active incident not found' });
+    }
+
+    res.json({ message: 'Location updated' });
+  } catch (err) {
+    console.error('[SOS] Location update error:', err.message);
+    res.status(500).json({ error: 'Failed to update location' });
   }
 };
 

@@ -19,6 +19,12 @@ class SosService {
     });
   }
 
+  Future<Map<String, dynamic>> updateSosLocation(String id, double latitude, double longitude) async {
+    return await _api.put('/api/sos/$id/location', {
+      'coordinates': [longitude, latitude],
+    });
+  }
+
   Future<Map<String, dynamic>> resolveSos(String id, {String? notes}) async {
     return await _api.put('/api/sos/$id/resolve', {
       'status': 'Resolved',

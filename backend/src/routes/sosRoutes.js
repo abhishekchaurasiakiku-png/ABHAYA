@@ -11,6 +11,7 @@ router.use(authMiddleware);
 
 router.post('/trigger', sosLimiter, validateSosTrigger, sosController.triggerSos);
 router.put('/:id/resolve', validateSosResolve, sosController.resolveSos);
+router.put('/:id/location', sosController.updateLocation);
 router.get('/active', sosController.getActiveSos);
 
 module.exports = router;
