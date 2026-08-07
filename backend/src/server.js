@@ -246,6 +246,8 @@ function listenWithRetry(startPort, maxAttempts = 20) {
   });
 }
 
+const seedDatabase = require('./config/seed');
+
 async function startServer() {
   try {
     // Start listening on HTTP port IMMEDIATELY so backend is instantly reachable
@@ -255,8 +257,11 @@ async function startServer() {
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 
     // Connect to MongoDB in parallel without blocking HTTP server startup
-    connectWithRetry().then(() => {
+    connectWithRetry().then(async () => {
       console.log(`📊 MongoDB state: ${mongoose.connection.readyState === 1 ? 'connected' : 'not connected'}`);
+      if (mongoose.connection.readyState === 1) {
+        await seedDatabase();
+      }
     });
   } catch (err) {
     console.error('❌ Failed to start server:', err.message);

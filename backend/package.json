@@ -7,6 +7,7 @@
     "start": "node src/server.js",
     "start:prod": "NODE_ENV=production node src/server.js",
     "dev": "node src/server.js",
+    "seed": "node -e \"require('dotenv').config(); const dns=require('dns'); try{dns.setServers(['8.8.8.8','1.1.1.1']);}catch(e){} const mongoose=require('mongoose'); const seed=require('./src/config/seed'); mongoose.connect(process.env.MONGODB_URI, {serverSelectionTimeoutMS:5000}).then(async ()=>{ await seed(); process.exit(0); }).catch(e=>{ console.error(e); process.exit(1); });\"",
     "lint": "echo 'Lint passed'"
   },
   "engines": {
