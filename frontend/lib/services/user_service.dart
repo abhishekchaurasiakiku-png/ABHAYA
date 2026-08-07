@@ -7,10 +7,21 @@ class UserService {
     return await _api.get('/api/users/profile');
   }
 
-  Future<Map<String, dynamic>> updateProfile({String? name, String? phone}) async {
+  Future<Map<String, dynamic>> updateProfile({
+    String? name,
+    String? phone,
+    String? bloodGroup,
+    String? medicalDetails,
+    String? homeAddress,
+    String? workAddress,
+  }) async {
     final body = <String, dynamic>{};
     if (name != null) body['name'] = name;
     if (phone != null) body['phone'] = phone;
+    if (bloodGroup != null) body['bloodGroup'] = bloodGroup;
+    if (medicalDetails != null) body['medicalDetails'] = medicalDetails;
+    if (homeAddress != null) body['homeAddress'] = homeAddress;
+    if (workAddress != null) body['workAddress'] = workAddress;
     return await _api.put('/api/users/profile', body);
   }
 

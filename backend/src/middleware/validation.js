@@ -98,6 +98,18 @@ const validateUpdateProfile = [
   body('profileImage')
     .optional()
     .isString().withMessage('Profile image must be a string'),
+  body('bloodGroup')
+    .optional()
+    .isString(),
+  body('medicalDetails')
+    .optional()
+    .isString(),
+  body('homeAddress')
+    .optional()
+    .isString(),
+  body('workAddress')
+    .optional()
+    .isString(),
   handleValidationErrors,
 ];
 

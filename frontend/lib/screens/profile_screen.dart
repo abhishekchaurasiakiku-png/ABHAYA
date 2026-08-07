@@ -8,6 +8,7 @@ import '../core/theme.dart';
 import '../services/user_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/glassmorphic_card.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -24,9 +25,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _bloodGroup = 'Not set';
   String _medicalNotes = 'No allergies or medical notes recorded yet.';
   String _homeAddress = 'Set residence address for automated arrival check-ins.';
+  String _workAddress = '';
   String? _profileImageUrl;
   bool _isLoading = true;
   bool _isUploading = false;
+  Map<String, dynamic> _rawProfileData = {};
 
   @override
   void initState() {
@@ -48,9 +51,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final data = await _userService.getProfile();
       if (mounted) {
         setState(() {
+          _rawProfileData = data;
           _name = data['name'] ?? _name;
           _email = data['email'] ?? _email;
           _phone = data['phone'] ?? _phone;
+          _bloodGroup = data['bloodGroup'] ?? 'Not set';
+          _medicalNotes = data['medicalDetails'] ?? 'No allergies or medical notes recorded yet.';
+          _homeAddress = data['homeAddress'] ?? 'Set residence address for automated arrival check-ins.';
+          _workAddress = data['workAddress'] ?? '';
           _profileImageUrl = data['profileImage'];
           _isLoading = false;
         });
@@ -201,16 +209,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 24),
 
               // Emergency & Medical Section
-              Row(
-                children: [
-                  Expanded(
-                    child: Text('Emergency & Medical...', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.edit, color: AppColors.neonCyan, size: 16),
-                  const SizedBox(width: 4),
-                  Text('Edit Details', style: GoogleFonts.poppins(color: AppColors.neonCyan, fontSize: 12)),
-                ],
+              GestureDetector(
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditProfileScreen(initialData: _rawProfileData),
+                    ),
+                  );
+                  if (result == true) {
+                    _loadProfile();
+                  }
+                },
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text('Emergency & Medical Details', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.edit, color: AppColors.neonCyan, size: 16),
+                    const SizedBox(width: 4),
+                    Text('Edit Details', style: GoogleFonts.poppins(color: AppColors.neonCyan, fontSize: 12, fontWeight: FontWeight.bold)),
+                  ],
+                ),
               ),
               const SizedBox(height: 6),
               Text(
@@ -240,9 +261,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildMedicalRow(
                       icon: Icons.home,
                       iconColor: Colors.blue,
-                      title: 'Home Safe Zone Geofence Address',
+                      title: 'Home Address',
                       subtitle: _homeAddress,
                     ),
+                    if (_workAddress.isNotEmpty)
+                      Column(
+                        children: [
+                          const Divider(color: AppColors.cardBorder, height: 24),
+                          _buildMedicalRow(
+                            icon: Icons.work,
+                            iconColor: Colors.orange,
+                            title: 'Work / School Address',
+                            subtitle: _workAddress,
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               ),

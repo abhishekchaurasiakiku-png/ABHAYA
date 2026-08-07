@@ -41,6 +41,22 @@ const userSchema = new mongoose.Schema({
   profileImage: {
     type: String,
   },
+  bloodGroup: {
+    type: String,
+    trim: true,
+  },
+  medicalDetails: {
+    type: String,
+    trim: true,
+  },
+  homeAddress: {
+    type: String,
+    trim: true,
+  },
+  workAddress: {
+    type: String,
+    trim: true,
+  },
   passwordHash: {
     type: String,
     required: true,

@@ -18,11 +18,15 @@ exports.getProfile = async (req, res) => {
  */
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, phone, profileImage } = req.body;
+    const { name, phone, profileImage, bloodGroup, medicalDetails, homeAddress, workAddress } = req.body;
     const updateFields = {};
     if (name !== undefined) updateFields.name = name;
     if (phone !== undefined) updateFields.phone = phone;
     if (profileImage !== undefined) updateFields.profileImage = profileImage;
+    if (bloodGroup !== undefined) updateFields.bloodGroup = bloodGroup;
+    if (medicalDetails !== undefined) updateFields.medicalDetails = medicalDetails;
+    if (homeAddress !== undefined) updateFields.homeAddress = homeAddress;
+    if (workAddress !== undefined) updateFields.workAddress = workAddress;
 
     const user = await User.findByIdAndUpdate(
       req.userId,
