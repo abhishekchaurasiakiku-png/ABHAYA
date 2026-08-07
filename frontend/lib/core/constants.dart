@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AppConstants {
@@ -6,7 +7,18 @@ class AppConstants {
 
   // Backend API
   // Reads RENDER_API_URL from frontend/.env file. If not found, defaults to Render URL.
-  static String get baseUrl => dotenv.env['RENDER_API_URL'] ?? 'https://abhaya-1-lwfo.onrender.com';
+  static String get baseUrl {
+    final envUrl = dotenv.env['RENDER_API_URL'];
+    if (envUrl != null && envUrl.isNotEmpty) {
+      // If configured for 10.0.2.2 (Android Emulator) but running on Windows/Web/Desktop/iOS, use localhost
+      final isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+      if (envUrl.contains('10.0.2.2') && !isAndroid) {
+        return envUrl.replaceAll('10.0.2.2', 'localhost');
+      }
+      return envUrl;
+    }
+    return 'https://abhaya-1-lwfo.onrender.com';
+  }
 
   // Helplines
   static const String womenHelpline = '1091';

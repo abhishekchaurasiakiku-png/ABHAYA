@@ -160,6 +160,12 @@ app.use((err, req, res, next) => {
 
 // ─── WebSocket ──────────────────────────────────────────────
 const wss = new WebSocketServer({ server, path: '/tracking' });
+wss.on('error', (err) => {
+  // Prevent unhandled error throw when server encounters EADDRINUSE during port retries
+  if (err.code !== 'EADDRINUSE') {
+    console.error('❌ WebSocket error:', err.message);
+  }
+});
 initializeWebSocket(wss);
 
 // ─── MongoDB Connection with Retry ──────────────────────────
@@ -167,9 +173,8 @@ const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ABHAYA';
 
 const MONGO_OPTIONS = {
-  serverSelectionTimeoutMS: 30000,
+  serverSelectionTimeoutMS: 5000,
   heartbeatFrequencyMS: 10000,
-  family: 4, // Force IPv4 to fix querySrv ECONNREFUSED on Windows
 };
 
 async function connectWithRetry(retries = 5, delay = 3000) {
@@ -182,8 +187,8 @@ async function connectWithRetry(retries = 5, delay = 3000) {
     } catch (err) {
       console.error(`❌ MongoDB connection attempt ${attempt}/${retries} failed:`, err.message);
       if (attempt === retries) {
-        console.error('❌ All MongoDB connection attempts exhausted. Starting server anyway for health checks.');
-        return; // Don't exit — let health check report degraded status
+        console.error('❌ All MongoDB connection attempts exhausted.');
+        return;
       }
       const backoff = delay * Math.pow(2, attempt - 1);
       console.log(`⏳ Retrying in ${backoff / 1000}s...`);
@@ -242,15 +247,17 @@ function listenWithRetry(startPort, maxAttempts = 20) {
 }
 
 async function startServer() {
-  // Connect to MongoDB first
-  await connectWithRetry();
-
   try {
+    // Start listening on HTTP port IMMEDIATELY so backend is instantly reachable
     const boundPort = await listenWithRetry(PORT);
     console.log(`🚀 SafeHer-AI Backend running on port ${boundPort}`);
     console.log(`📡 WebSocket server ready at ws://localhost:${boundPort}/tracking`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`📊 MongoDB state: ${mongoose.connection.readyState === 1 ? 'connected' : 'not connected'}`);
+
+    // Connect to MongoDB in parallel without blocking HTTP server startup
+    connectWithRetry().then(() => {
+      console.log(`📊 MongoDB state: ${mongoose.connection.readyState === 1 ? 'connected' : 'not connected'}`);
+    });
   } catch (err) {
     console.error('❌ Failed to start server:', err.message);
     process.exit(1);
