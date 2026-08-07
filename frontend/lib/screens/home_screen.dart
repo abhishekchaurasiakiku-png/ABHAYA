@@ -2,6 +2,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:torch_light/torch_light.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
 import '../core/theme.dart';
 import '../core/constants.dart';
 import '../services/auth_service.dart';
@@ -21,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _userName = 'User';
   late Map<String, String> _currentTip;
+  bool _isTorchOn = false;
 
   @override
   void initState() {
@@ -37,6 +42,32 @@ class _HomeScreenState extends State<HomeScreen> {
       final name = await AuthService().getUserName();
       if (mounted) setState(() => _userName = name);
     }
+  }
+
+  void _toggleFlashlight() async {
+    try {
+      final isTorchAvailable = await TorchLight.isTorchAvailable();
+      if (isTorchAvailable) {
+        if (_isTorchOn) {
+          await TorchLight.disableTorch();
+        } else {
+          await TorchLight.enableTorch();
+        }
+        if (mounted) setState(() => _isTorchOn = !_isTorchOn);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not toggle flashlight')),
+        );
+      }
+    }
+  }
+
+  void _recordEvidence() async {
+    final picker = ImagePicker();
+    await picker.pickVideo(source: ImageSource.camera);
+    // In a real app, this video would be saved/uploaded securely
   }
 
   @override
@@ -178,13 +209,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.fiber_manual_record,
                     label: 'Evidence',
                     iconColor: AppColors.neonCyan,
-                    onTap: () {},
+                    onTap: _recordEvidence,
                   ),
                   QuickActionButton(
                     icon: Icons.flashlight_on,
-                    label: 'Flashlight',
-                    iconColor: Colors.orange,
-                    onTap: () {},
+                    label: _isTorchOn ? 'Flash Off' : 'Flashlight',
+                    iconColor: _isTorchOn ? Colors.white : Colors.orange,
+                    onTap: _toggleFlashlight,
                   ),
                 ],
               ),
@@ -211,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Live Location',
                     subtitle: 'Share real-time GPS',
                     iconColor: AppColors.neonCyan,
-                    onTap: () {},
+                    onTap: _shareLiveLocation,
                   ),
                   SafetyToolkitTile(
                     icon: Icons.contacts,
@@ -225,21 +256,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Safety Zone',
                     subtitle: 'Geofence all-clear',
                     iconColor: AppColors.neonGreen,
-                    onTap: () {},
+                    onTap: () => Navigator.pushNamed(context, '/main'), // Assumes tab change or map screen
                   ),
                   SafetyToolkitTile(
                     icon: Icons.directions_walk,
                     title: 'Safe Route',
                     subtitle: 'AI monitored naviga...',
                     iconColor: Colors.blue,
-                    onTap: () {},
+                    onTap: _findPoliceStation, // Routing to safe place
                   ),
                   SafetyToolkitTile(
                     icon: Icons.local_police,
                     title: 'Nearby Police',
                     subtitle: 'Locate closest stati...',
                     iconColor: Colors.orange,
-                    onTap: () {},
+                    onTap: _findPoliceStation,
                   ),
                   SafetyToolkitTile(
                     icon: Icons.history,
@@ -310,7 +341,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _dial(String number) async {
-    final uri = Uri.parse('tel:$number');
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
+    await FlutterPhoneDirectCaller.callNumber(number);
+  }
+
+  void _shareLiveLocation() async {
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      final mapsUrl = 'https://maps.google.com/?q=${position.latitude},${position.longitude}';
+      final uri = Uri.parse('sms:?body=My Live Location: $mapsUrl');
+      if (await canLaunchUrl(uri)) await launchUrl(uri);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not fetch location to share')),
+        );
+      }
+    }
+  }
+
+  void _findPoliceStation() async {
+    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=police+station');
+    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
