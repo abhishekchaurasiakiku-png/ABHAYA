@@ -6,7 +6,7 @@ class AppConstants {
 
   // Backend API
   // Reads RENDER_API_URL from frontend/.env file. If not found, defaults to Render URL.
-  static String get baseUrl => dotenv.env['RENDER_API_URL'] ?? 'https://safeher-ai-backend.onrender.com';
+  static String get baseUrl => dotenv.env['RENDER_API_URL'] ?? 'https://abhaya-1-lwfo.onrender.com';
 
   // Helplines
   static const String womenHelpline = '1091';
