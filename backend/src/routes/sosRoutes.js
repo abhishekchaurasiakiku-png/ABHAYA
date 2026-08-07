@@ -10,6 +10,7 @@ const {
 router.use(authMiddleware);
 
 router.post('/trigger', sosLimiter, validateSosTrigger, sosController.triggerSos);
+router.post('/share-location', sosController.shareLiveLocation);
 router.put('/:id/resolve', validateSosResolve, sosController.resolveSos);
 router.put('/:id/location', sosController.updateLocation);
 router.get('/active', sosController.getActiveSos);

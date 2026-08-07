@@ -36,4 +36,13 @@ class SosService {
   Future<Map<String, dynamic>> getActiveSos() async {
     return await _api.get('/api/sos/active');
   }
+
+  Future<Map<String, dynamic>> shareLiveLocation(double latitude, double longitude) async {
+    return await _api.post('/api/sos/share-location', {
+      'location': {
+        'type': 'Point',
+        'coordinates': [longitude, latitude],
+      }
+    });
+  }
 }

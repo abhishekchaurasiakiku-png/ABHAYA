@@ -14,7 +14,9 @@ import '../widgets/glassmorphic_card.dart';
 import '../widgets/quick_action_button.dart';
 import '../widgets/safety_toolkit_tile.dart';
 import '../services/user_service.dart';
+import '../services/sos_service.dart';
 import 'map_screen.dart';
+import 'trip_monitor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -264,7 +266,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Safe Route',
                     subtitle: 'AI monitored naviga...',
                     iconColor: Colors.blue,
-                    onTap: _findPoliceStation, // Routing to safe place
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const TripMonitorScreen()),
+                      );
+                    }, // Routing to Safe Commute UI
                   ),
                   SafetyToolkitTile(
                     icon: Icons.local_police,
@@ -347,14 +354,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _shareLiveLocation() async {
     try {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sharing location with trusted contacts...')),
+        );
+      }
       final position = await Geolocator.getCurrentPosition();
-      final mapsUrl = 'https://maps.google.com/?q=${position.latitude},${position.longitude}';
-      final uri = Uri.parse('sms:?body=My Live Location: $mapsUrl');
-      if (await canLaunchUrl(uri)) await launchUrl(uri);
+      await SosService().shareLiveLocation(position.latitude, position.longitude);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Live location sent via Email/SMS!')),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not fetch location to share')),
+          const SnackBar(content: Text('Could not fetch or share location')),
         );
       }
     }

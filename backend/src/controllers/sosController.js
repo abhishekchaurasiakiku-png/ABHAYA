@@ -166,3 +166,40 @@ exports.getActiveSos = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch active incidents' });
   }
 };
+
+/**
+ * POST /api/sos/share-location
+ * Send live location to trusted contacts without triggering SOS
+ */
+exports.shareLiveLocation = async (req, res) => {
+  try {
+    const { location } = req.body;
+    
+    if (!location || !location.coordinates) {
+      return res.status(400).json({ error: 'Location is required' });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user || user.emergencyContacts.length === 0) {
+      return res.status(400).json({ error: 'No emergency contacts found' });
+    }
+
+    const mapsUrl = `https://maps.google.com/?q=${location.coordinates[1]},${location.coordinates[0]}`;
+    const emailHtml = `<h2>Live Location Update: ${user.name}</h2><p>${user.name} is sharing their live location with you.</p><p>View on Map: <a href="${mapsUrl}">${mapsUrl}</a></p>`;
+    const smsMessage = `${user.name} is sharing their live location: ${mapsUrl}`;
+
+    for (const contact of user.emergencyContacts) {
+      if (contact.email) {
+        sendSosEmail(contact.email, `Live Location Update from ${user.name}`, emailHtml);
+      }
+      if (contact.phone) {
+        sendSosSms(contact.phone, smsMessage);
+      }
+    }
+
+    res.json({ message: 'Live location shared successfully' });
+  } catch (err) {
+    console.error('[SOS] Share location error:', err.message);
+    res.status(500).json({ error: 'Failed to share live location' });
+  }
+};
