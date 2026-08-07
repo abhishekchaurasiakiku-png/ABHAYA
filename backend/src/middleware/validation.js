@@ -25,8 +25,8 @@ const validateRegister = [
     .notEmpty().withMessage('Name is required')
     .isLength({ min: 2, max: 100 }).withMessage('Name must be 2-100 characters'),
   body('phone')
+    .optional({ checkFalsy: true })
     .trim()
-    .notEmpty().withMessage('Phone number is required')
     .matches(/^\+?[\d\s\-()]{7,20}$/).withMessage('Invalid phone number format'),
   body('email')
     .trim()

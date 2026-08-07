@@ -1,4 +1,13 @@
 require('dotenv').config();
+const dns = require('dns');
+
+// Configure fallback DNS servers (Google & Cloudflare) to prevent querySrv ECONNREFUSED on local networks
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+} catch (e) {
+  console.warn('⚠️ Could not set custom DNS servers:', e.message);
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -21,6 +30,10 @@ const safetyRoutes = require('./routes/safetyRoutes');
 
 // Services
 const { initializeWebSocket } = require('./services/websocketService');
+
+// Swagger Documentation
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 const app = express();
 const server = http.createServer(app);
@@ -78,6 +91,9 @@ app.use('/api/sos', sosRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/incidents', incidentRoutes);
 app.use('/api/safety', safetyRoutes);
+
+// Swagger Documentation Route
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Helper to safely extract database host for diagnostics
 function getDatabaseHost(uri) {
@@ -148,11 +164,12 @@ initializeWebSocket(wss);
 
 // ─── MongoDB Connection with Retry ──────────────────────────
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/safeher-ai';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ABHAYA';
 
 const MONGO_OPTIONS = {
   serverSelectionTimeoutMS: 30000,
   heartbeatFrequencyMS: 10000,
+  family: 4, // Force IPv4 to fix querySrv ECONNREFUSED on Windows
 };
 
 async function connectWithRetry(retries = 5, delay = 3000) {
