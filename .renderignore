@@ -1,0 +1,8 @@
+# Ignore non-backend files to speed up Render build context uploading
+frontend/
+build/
+.git/
+.vscode/
+.dart_tool/
+*.md
+docs/
