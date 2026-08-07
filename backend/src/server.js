@@ -1,8 +1,9 @@
 require('dotenv').config();
 const dns = require('dns');
+const config = require('./config/env');
 
 // Configure fallback DNS servers on local networks (bypassed on cloud environments like Render)
-if (!process.env.RENDER && process.env.NODE_ENV !== 'production') {
+if (config.env !== 'production') {
   try {
     dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
   } catch (e) {
@@ -55,8 +56,8 @@ const corsOptions = {
     ];
 
     // In production, add your deployed frontend domain
-    if (process.env.CORS_ORIGIN) {
-      allowedOrigins.push(process.env.CORS_ORIGIN);
+    if (config.corsOrigin) {
+      allowedOrigins.push(config.corsOrigin);
     }
 
     if (allowedOrigins.includes(origin)) {
@@ -73,7 +74,7 @@ const corsOptions = {
 // ─── Middleware ──────────────────────────────────────────────
 app.use(helmet());
 app.use(cors(corsOptions));
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(morgan(config.env === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -81,7 +82,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(generalLimiter);
 
 // Ensure uploads directory exists
-const uploadDir = process.env.UPLOAD_DIR || './uploads';
+const uploadDir = config.uploadDir;
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -132,10 +133,10 @@ app.get('/api/health', (req, res) => {
     service: 'SafeHer-AI Backend',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development',
+    environment: config.env,
     mongodb: mongoStates[mongoState] || 'unknown',
-    databaseHost: getDatabaseHost(MONGODB_URI),
-    obfuscatedUri: obfuscateUri(MONGODB_URI),
+    databaseHost: getDatabaseHost(config.mongodbUri),
+    obfuscatedUri: obfuscateUri(config.mongodbUri),
   });
 });
 
@@ -154,7 +155,7 @@ app.use((err, req, res, next) => {
   }
 
   res.status(err.status || 500).json({
-    error: process.env.NODE_ENV === 'production'
+    error: config.env === 'production'
       ? 'Internal Server Error'
       : err.message || 'Internal Server Error',
   });
@@ -171,8 +172,8 @@ wss.on('error', (err) => {
 initializeWebSocket(wss);
 
 // ─── MongoDB Connection with Retry ──────────────────────────
-const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ABHAYA';
+const PORT = config.port;
+const MONGODB_URI = config.mongodbUri;
 
 const MONGO_OPTIONS = {
   serverSelectionTimeoutMS: 5000,
@@ -241,7 +242,7 @@ function listenWithRetry(startPort, maxAttempts = 20) {
 
       server.once('error', onError);
       server.once('listening', onListening);
-      server.listen(port);
+      server.listen(port, '0.0.0.0');
     }
 
     attemptListen(basePort);
@@ -256,7 +257,7 @@ async function startServer() {
     const boundPort = await listenWithRetry(PORT);
     console.log(`🚀 SafeHer-AI Backend running on port ${boundPort}`);
     console.log(`📡 WebSocket server ready at ws://localhost:${boundPort}/tracking`);
-    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌍 Environment: ${config.env}`);
 
     // Connect to MongoDB in parallel without blocking HTTP server startup
     connectWithRetry().then(async () => {

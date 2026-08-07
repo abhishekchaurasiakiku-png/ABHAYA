@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const config = require('../config/env');
 
 /**
  * Helper to safely sanitize and validate timespan strings from environment variables
@@ -22,9 +23,9 @@ const getExpiry = (envVal, fallback) => {
  * Generate JWT access and refresh tokens.
  */
 const generateTokens = (userId) => {
-  const secret = process.env.JWT_SECRET || 'default-secret-key-change-in-prod';
-  const accessExpiry = getExpiry(process.env.JWT_EXPIRES_IN, '7d');
-  const refreshExpiry = getExpiry(process.env.JWT_REFRESH_EXPIRES_IN, '30d');
+  const secret = config.jwt.secret;
+  const accessExpiry = getExpiry(config.jwt.expiresIn, '7d');
+  const refreshExpiry = getExpiry(config.jwt.refreshExpiresIn, '30d');
 
   const token = jwt.sign(
     { userId },
@@ -157,7 +158,7 @@ exports.refreshToken = async (req, res) => {
       return res.status(400).json({ error: 'Refresh token required' });
     }
 
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const decoded = jwt.verify(refreshToken, config.jwt.secret);
     const user = await User.findById(decoded.userId);
 
     if (!user || user.refreshToken !== refreshToken) {
