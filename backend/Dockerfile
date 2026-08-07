@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Install dependencies first (cache layer)
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # ─── Stage 2: Production ────────────────────────────────────
 FROM node:20-alpine
