@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core/theme.dart';
 import '../services/location_service.dart';
 import '../services/safety_service.dart';
+import '../services/map_service.dart';
 import '../widgets/glassmorphic_card.dart';
 
 class MapScreen extends StatefulWidget {
@@ -18,12 +19,16 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final LocationService _locationService = LocationService();
   final SafetyService _safetyService = SafetyService();
+  final MapService _mapService = MapService();
   final MapController _mapController = MapController();
   LatLng _currentLocation = const LatLng(25.2425, 86.9842); // Default: IIIT Bhagalpur
   bool _isLoading = true;
+  bool _isRouting = false;
   String _riskLabel = 'Low Risk (94% Safe)';
   Color _riskColor = AppColors.neonGreen;
   String _geofenceLabel = 'GEOFENCE: SAFE ZONE';
+  List<LatLng> _policeStations = [];
+  List<LatLng> _routePoints = [];
 
   @override
   void initState() {
@@ -77,14 +82,31 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  void _openGoogleMaps() async {
-    final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=${_currentLocation.latitude},${_currentLocation.longitude}&travelmode=walking');
-    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+  void _findPoliceStation() async {
+    setState(() => _isLoading = true);
+    final stations = await _mapService.getNearbyPoliceStations(_currentLocation.latitude, _currentLocation.longitude);
+    if (mounted) {
+      setState(() {
+        _policeStations = stations;
+        _isLoading = false;
+      });
+      if (stations.isNotEmpty) {
+        _calculateRouteTo(stations.first);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No police stations found nearby')));
+      }
+    }
   }
 
-  void _findPoliceStation() async {
-    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=police+station');
-    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+  void _calculateRouteTo(LatLng destination) async {
+    setState(() => _isRouting = true);
+    final route = await _mapService.getRoute(_currentLocation, destination);
+    if (mounted) {
+      setState(() {
+        _routePoints = route;
+        _isRouting = false;
+      });
+    }
   }
 
   @override
@@ -157,6 +179,16 @@ class _MapScreenState extends State<MapScreen> {
                             ),
                           ],
                         ),
+                        PolylineLayer(
+                          polylines: [
+                            if (_routePoints.isNotEmpty)
+                              Polyline(
+                                points: _routePoints,
+                                strokeWidth: 4.0,
+                                color: AppColors.neonPurple,
+                              ),
+                          ],
+                        ),
                         MarkerLayer(
                           markers: [
                             Marker(
@@ -172,6 +204,22 @@ class _MapScreenState extends State<MapScreen> {
                                 child: const Icon(Icons.my_location, color: AppColors.sosPink, size: 20),
                               ),
                             ),
+                            ..._policeStations.map((station) => Marker(
+                                  point: station,
+                                  width: 40,
+                                  height: 40,
+                                  child: GestureDetector(
+                                    onTap: () => _calculateRouteTo(station),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.blue.withValues(alpha: 0.8),
+                                        border: Border.all(color: Colors.white, width: 2),
+                                      ),
+                                      child: const Icon(Icons.local_police, color: Colors.white, size: 20),
+                                    ),
+                                  ),
+                                )),
                           ],
                         ),
                       ],
@@ -206,7 +254,7 @@ class _MapScreenState extends State<MapScreen> {
 
               // Navigate Button
               GestureDetector(
-                onTap: _openGoogleMaps,
+                onTap: _findPoliceStation,
                 child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -217,35 +265,22 @@ class _MapScreenState extends State<MapScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.navigation, color: Colors.white, size: 20),
+                      const Icon(Icons.radar, color: Colors.white, size: 20),
                       const SizedBox(width: 8),
-                      Text('Launch Live Navigation in Google', style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text('Scan for Nearby Police Stations', style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 12),
               
-              // Police Station AI Button
-              GestureDetector(
-                onTap: _findPoliceStation,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    gradient: const LinearGradient(colors: [Colors.indigo, Colors.blueAccent]),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.local_police, color: Colors.white, size: 20),
-                      const SizedBox(width: 8),
-                      Text('Find Nearest Police Station (AI)', style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                    ],
-                  ),
+              if (_isRouting)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12.0),
+                  child: Center(child: CircularProgressIndicator(color: AppColors.neonPurple)),
                 ),
-              ),
+                
+              // (Removed old AI button as the scanning button replaces it)
               const SizedBox(height: 24),
 
               // Safety Analysis

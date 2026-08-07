@@ -14,6 +14,7 @@ import '../widgets/glassmorphic_card.dart';
 import '../widgets/quick_action_button.dart';
 import '../widgets/safety_toolkit_tile.dart';
 import '../services/user_service.dart';
+import 'map_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -359,8 +360,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _findPoliceStation() async {
-    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=police+station');
-    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+  void _findPoliceStation() {
+    // Navigate to MapScreen which will handle its own Police Station rendering now.
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Scaffold(
+        appBar: null, // Let MapScreen use safe area
+        body: MapScreen(),
+      )),
+    );
   }
 }
