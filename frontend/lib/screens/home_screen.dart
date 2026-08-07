@@ -1,152 +1,298 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../core/theme.dart';
+import '../core/constants.dart';
+import '../services/auth_service.dart';
 import '../widgets/sos_button.dart';
+import '../widgets/glassmorphic_card.dart';
+import '../widgets/quick_action_button.dart';
+import '../widgets/safety_toolkit_tile.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _userName = 'User';
+  late Map<String, String> _currentTip;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+    _currentTip = AppConstants.safetyTips[Random().nextInt(AppConstants.safetyTips.length)];
+  }
+
+  void _loadUserName() async {
+    final name = await AuthService().getUserName();
+    if (mounted) setState(() => _userName = name);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text('A.B.H.A.Y.A', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, letterSpacing: 2)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shield_outlined, color: Colors.redAccent),
-            onPressed: () {
-              // Status / settings
-            },
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          // Background placeholder for Map
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.15,
-              child: Image.network(
-                'https://static.vecteezy.com/system/resources/previews/000/153/588/original/vector-roadmap-location-map.jpg',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          // Top gradient for appbar readability
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 120,
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF0F172A), Colors.transparent],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-            ),
-          ),
-          
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
-                // Location info pill
-                Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hello, $_userName ✨',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.location_on, color: Colors.greenAccent, size: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Tracking Active • NY, USA",
-                              style: GoogleFonts.poppins(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: 8, height: 8,
+                            decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.neonGreen),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Shield Active & Monitoring',
+                            style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [AppColors.neonCyan.withValues(alpha: 0.3), AppColors.neonPurple.withValues(alpha: 0.3)],
+                      ),
+                      border: Border.all(color: AppColors.neonCyan.withValues(alpha: 0.4)),
+                    ),
+                    child: const Icon(Icons.gps_fixed, color: AppColors.neonCyan, size: 22),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Live Protection Card
+              GlassmorphicCard(
+                borderColor: AppColors.neonPurple.withValues(alpha: 0.3),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: AppColors.sosPink.withValues(alpha: 0.2),
                             ),
-                          ],
-                        ),
+                            child: Text(
+                              'LIVE PROTECTION',
+                              style: GoogleFonts.poppins(color: AppColors.sosPink, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'You Are Never\nAlone',
+                            style: GoogleFonts.poppins(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, height: 1.2),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'SafeHer AI & real-time guardian shield is actively guarding your journey 24/7.',
+                            style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ),
-                
-                const Spacer(),
-                
-                // SOS Button Area
-                const Center(
-                  child: SosButton(),
-                ),
-                
-                const Spacer(),
-                
-                // Bottom Control Panel
-                Container(
-                  margin: const EdgeInsets.all(24),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B).withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [AppColors.neonCyan.withValues(alpha: 0.3), AppColors.neonPurple.withValues(alpha: 0.3)],
+                        ),
                       ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildBottomNavAction(context, Icons.group_outlined, "Guardians", () => Navigator.pushNamed(context, '/contacts')),
-                      _buildBottomNavAction(context, Icons.mic_none, "AI Voice", () {}),
-                      _buildBottomNavAction(context, Icons.video_call_outlined, "Record", () {}),
-                    ],
-                  ),
+                      child: const Icon(Icons.verified_user, color: AppColors.neonCyan, size: 36),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 28),
+
+              // SOS Button
+              const Center(child: SosButton()),
+              const SizedBox(height: 24),
+
+              // Quick Actions Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  QuickActionButton(
+                    icon: Icons.phone,
+                    label: 'Emergency',
+                    iconColor: AppColors.sosPink,
+                    onTap: () => _dial('112'),
+                  ),
+                  QuickActionButton(
+                    icon: Icons.support_agent,
+                    label: '1091 Wom...',
+                    iconColor: AppColors.neonPurple,
+                    onTap: () => _dial('1091'),
+                  ),
+                  QuickActionButton(
+                    icon: Icons.fiber_manual_record,
+                    label: 'Evidence',
+                    iconColor: AppColors.neonCyan,
+                    onTap: () {},
+                  ),
+                  QuickActionButton(
+                    icon: Icons.flashlight_on,
+                    label: 'Flashlight',
+                    iconColor: Colors.orange,
+                    onTap: () {},
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+
+              // Safety Toolkit
+              Text(
+                'Safety Toolkit',
+                style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 14),
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.5,
+                children: [
+                  SafetyToolkitTile(
+                    icon: Icons.my_location,
+                    title: 'Live Location',
+                    subtitle: 'Share real-time GPS',
+                    iconColor: AppColors.neonCyan,
+                    onTap: () {},
+                  ),
+                  SafetyToolkitTile(
+                    icon: Icons.contacts,
+                    title: 'Emergency C...',
+                    subtitle: 'Call or alert guardia...',
+                    iconColor: AppColors.sosPink,
+                    onTap: () => Navigator.pushNamed(context, '/contacts'),
+                  ),
+                  SafetyToolkitTile(
+                    icon: Icons.verified_user,
+                    title: 'Safety Zone',
+                    subtitle: 'Geofence all-clear',
+                    iconColor: AppColors.neonGreen,
+                    onTap: () {},
+                  ),
+                  SafetyToolkitTile(
+                    icon: Icons.directions_walk,
+                    title: 'Safe Route',
+                    subtitle: 'AI monitored naviga...',
+                    iconColor: Colors.blue,
+                    onTap: () {},
+                  ),
+                  SafetyToolkitTile(
+                    icon: Icons.local_police,
+                    title: 'Nearby Police',
+                    subtitle: 'Locate closest stati...',
+                    iconColor: Colors.orange,
+                    onTap: () {},
+                  ),
+                  SafetyToolkitTile(
+                    icon: Icons.history,
+                    title: 'Incident History',
+                    subtitle: 'View security logs',
+                    iconColor: AppColors.neonGreen,
+                    onTap: () {},
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Daily Safety Tip
+              GlassmorphicCard(
+                borderColor: Colors.amber.withValues(alpha: 0.2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'DAILY SAFETY TIP',
+                          style: GoogleFonts.poppins(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        ),
+                        const Icon(Icons.auto_awesome, color: Colors.amber, size: 16),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.amber.withValues(alpha: 0.15),
+                          ),
+                          child: const Icon(Icons.lightbulb, color: Colors.amber, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _currentTip['title']!,
+                                style: GoogleFonts.poppins(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _currentTip['body']!,
+                                style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildBottomNavAction(BuildContext context, IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.05),
-            ),
-            child: Icon(icon, color: Colors.white, size: 24),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: GoogleFonts.poppins(color: Colors.white70, fontSize: 12),
-          ),
-        ],
-      ),
-    );
+  void _dial(String number) async {
+    final uri = Uri.parse('tel:$number');
+    if (await canLaunchUrl(uri)) await launchUrl(uri);
   }
 }

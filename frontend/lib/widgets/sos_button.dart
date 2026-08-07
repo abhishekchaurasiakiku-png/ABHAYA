@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../services/sos_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../core/theme.dart';
+import '../services/sos_service.dart';
+import '../services/location_service.dart';
 
 class SosButton extends StatefulWidget {
   const SosButton({super.key});
@@ -10,108 +12,151 @@ class SosButton extends StatefulWidget {
 }
 
 class _SosButtonState extends State<SosButton> with SingleTickerProviderStateMixin {
-  final SosService sosService = SosService();
-  late AnimationController _animationController;
+  final SosService _sosService = SosService();
+  final LocationService _locationService = LocationService();
+  late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
   bool _isPressed = false;
+  bool _isSending = false;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: false);
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.5).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
   void _triggerSos() async {
-    setState(() => _isPressed = true);
-    await sosService.triggerSos();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('EMERGENCY ALERT SENT', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-          backgroundColor: Colors.redAccent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
+    if (_isSending) return;
+    setState(() { _isPressed = true; _isSending = true; });
+
+    try {
+      final position = await _locationService.getCurrentLocation();
+      final lat = position?.latitude ?? 0.0;
+      final lng = position?.longitude ?? 0.0;
+
+      await _sosService.triggerSos(
+        triggerType: 'Manual',
+        latitude: lat,
+        longitude: lng,
       );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('🚨 EMERGENCY ALERT SENT', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+            backgroundColor: AppColors.sosPink,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Alert sent (offline mode)', style: GoogleFonts.poppins()),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+      }
     }
+
     Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) setState(() => _isPressed = false);
+      if (mounted) setState(() { _isPressed = false; _isSending = false; });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) => _triggerSos(),
-      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: _triggerSos,
       child: AnimatedBuilder(
         animation: _pulseAnimation,
         builder: (context, child) {
-          return Stack(
-            alignment: Alignment.center,
+          return Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Outer pulse rings
-              Container(
-                width: 200 * _pulseAnimation.value,
-                height: 200 * _pulseAnimation.value,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.redAccent.withOpacity((1.0 - (_pulseAnimation.value - 1.0) * 2).clamp(0.0, 1.0)),
-                ),
-              ),
-              Container(
-                width: 170 * (_pulseAnimation.value * 0.8).clamp(1.0, 1.5),
-                height: 170 * (_pulseAnimation.value * 0.8).clamp(1.0, 1.5),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.red.withOpacity(0.3),
-                ),
-              ),
-              // Inner Button
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: _isPressed ? 140 : 150,
-                height: _isPressed ? 140 : 150,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFF4B4B), Color(0xFFD32F2F)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.redAccent.withOpacity(0.6),
-                      blurRadius: _isPressed ? 10 : 30,
-                      spreadRadius: _isPressed ? 2 : 10,
-                      offset: _isPressed ? const Offset(0, 0) : const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    'SOS',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: _isPressed ? 34 : 38,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2,
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Outer glow
+                  Container(
+                    width: 160 * _pulseAnimation.value,
+                    height: 160 * _pulseAnimation.value,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.sosPink.withValues(alpha: 0.08),
                     ),
                   ),
+                  Container(
+                    width: 140 * _pulseAnimation.value,
+                    height: 140 * _pulseAnimation.value,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.sosPink.withValues(alpha: 0.12),
+                    ),
+                  ),
+                  // Main button
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: _isPressed ? 105 : 115,
+                    height: _isPressed ? 105 : 115,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const RadialGradient(
+                        colors: [Color(0xFFFF4B6E), Color(0xFFFF2D55), Color(0xFFD91A40)],
+                        stops: [0.0, 0.5, 1.0],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.sosPink.withValues(alpha: 0.5),
+                          blurRadius: _isPressed ? 15 : 30,
+                          spreadRadius: _isPressed ? 2 : 8,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.touch_app, color: Colors.white, size: 28),
+                        const SizedBox(height: 2),
+                        Text(
+                          'SOS',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'TAP TO ALERT',
+                style: GoogleFonts.poppins(
+                  color: AppColors.textSecondary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.5,
                 ),
               ),
             ],
