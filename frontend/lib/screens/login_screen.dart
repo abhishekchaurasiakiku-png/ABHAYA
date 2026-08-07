@@ -15,6 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _authService = AuthService();
   bool _isLogin = true;
   bool _isLoading = false;
@@ -31,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _nameController.text.trim(),
           _emailController.text.trim(),
           _passwordController.text,
+          phone: _phoneController.text.trim(),
         );
       }
       if (mounted) Navigator.pushReplacementNamed(context, '/main');
@@ -102,6 +104,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   if (!_isLogin) ...[
                     _buildTextField(_nameController, 'Full Name', Icons.person_outline),
+                    const SizedBox(height: 14),
+                    _buildTextField(_phoneController, 'Phone Number (e.g. +91...)', Icons.phone_outlined),
                     const SizedBox(height: 14),
                   ],
                   _buildTextField(_emailController, 'Email', Icons.email_outlined),
