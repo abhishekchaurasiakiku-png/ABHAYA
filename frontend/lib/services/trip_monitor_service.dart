@@ -101,6 +101,7 @@ class TripMonitorService {
           latitude: pos.latitude,
           longitude: pos.longitude,
         );
+        await SosService().openNativeSms(pos.latitude, pos.longitude, isSos: true);
       }
     } catch (e) {
       // Auto SOS failed

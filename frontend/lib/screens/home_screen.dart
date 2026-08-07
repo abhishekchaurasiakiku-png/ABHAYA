@@ -377,6 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
       await SosService().shareLiveLocation(position.latitude, position.longitude);
+      await SosService().openNativeSms(position.latitude, position.longitude, isSos: false);
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

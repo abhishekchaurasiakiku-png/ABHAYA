@@ -37,6 +37,7 @@ class _SosButtonState extends State<SosButton> {
         latitude: lat,
         longitude: lng,
       );
+      await _sosService.openNativeSms(lat, lng, isSos: true);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

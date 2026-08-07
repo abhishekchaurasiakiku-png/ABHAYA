@@ -65,6 +65,7 @@ class _MainShellState extends State<MainShell> {
         latitude: position?.latitude ?? 0.0,
         longitude: position?.longitude ?? 0.0,
       );
+      await SosService().openNativeSms(position?.latitude ?? 0.0, position?.longitude ?? 0.0, isSos: true);
       
       setState(() {
         _isSosActive = true;

@@ -1,3 +1,4 @@
+import 'package:url_launcher/url_launcher.dart';
 import 'api_service.dart';
 
 class SosService {
@@ -44,5 +45,24 @@ class SosService {
         'coordinates': [longitude, latitude],
       }
     });
+  }
+
+  Future<void> openNativeSms(double latitude, double longitude, {bool isSos = false}) async {
+    final mapsUrl = 'https://maps.google.com/?q=$latitude,$longitude';
+    final message = isSos 
+      ? '🚨 SOS ALERT! I need immediate help. My live location: $mapsUrl'
+      : '📍 Here is my live location: $mapsUrl';
+      
+    final Uri smsUri = Uri(
+      scheme: 'sms',
+      path: '',
+      queryParameters: <String, String>{
+        'body': message,
+      },
+    );
+    
+    if (await canLaunchUrl(smsUri)) {
+      await launchUrl(smsUri);
+    }
   }
 }
