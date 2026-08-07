@@ -179,10 +179,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
-                          colors: [AppColors.neonCyan.withValues(alpha: 0.3), AppColors.neonPurple.withValues(alpha: 0.3)],
+                          colors: [AppColors.accentPink.withValues(alpha: 0.3), AppColors.neonPurple.withValues(alpha: 0.3)],
                         ),
                       ),
-                      child: const Icon(Icons.verified_user, color: AppColors.neonCyan, size: 36),
+                      child: const Icon(Icons.verified_user, color: AppColors.accentPink, size: 36),
                     ),
                   ],
                 ),
@@ -208,19 +208,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   QuickActionButton(
                     icon: Icons.support_agent,
                     label: '1091 Wom...',
-                    iconColor: AppColors.neonPurple,
+                    iconColor: AppColors.accentPink,
                     onTap: () => _dial('1091'),
                   ),
                   QuickActionButton(
                     icon: Icons.fiber_manual_record,
                     label: 'Evidence',
-                    iconColor: AppColors.neonCyan,
+                    iconColor: AppColors.neonPurple,
                     onTap: _recordEvidence,
                   ),
                   QuickActionButton(
                     icon: Icons.flashlight_on,
                     label: _isTorchOn ? 'Flash Off' : 'Flashlight',
-                    iconColor: _isTorchOn ? Colors.white : Colors.orange,
+                    iconColor: _isTorchOn ? Colors.white : AppColors.neonPurple.withValues(alpha: 0.7),
                     onTap: _toggleFlashlight,
                   ),
                 ],
@@ -247,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.my_location,
                     title: 'Live Location',
                     subtitle: 'Share real-time GPS',
-                    iconColor: AppColors.neonCyan,
+                    iconColor: AppColors.accentPink,
                     onTap: _shareLiveLocation,
                   ),
                   SafetyToolkitTile(
@@ -261,14 +261,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.verified_user,
                     title: 'Safety Zone',
                     subtitle: 'Geofence all-clear',
-                    iconColor: AppColors.neonGreen,
+                    iconColor: AppColors.neonPurple,
                     onTap: () => Navigator.pushNamed(context, '/main'), // Assumes tab change or map screen
                   ),
                   SafetyToolkitTile(
                     icon: Icons.directions_walk,
                     title: 'Safe Route',
                     subtitle: 'AI monitored naviga...',
-                    iconColor: Colors.blue,
+                    iconColor: AppColors.neonPurple,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -280,14 +280,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: Icons.local_police,
                     title: 'Nearby Police',
                     subtitle: 'Locate closest stati...',
-                    iconColor: Colors.orange,
+                    iconColor: AppColors.accentPink,
                     onTap: _findPoliceStation,
                   ),
                   SafetyToolkitTile(
                     icon: Icons.history,
                     title: 'Incident History',
                     subtitle: 'View security logs',
-                    iconColor: AppColors.neonGreen,
+                    iconColor: AppColors.neonPurple,
                     onTap: () {
                       Navigator.push(
                         context,

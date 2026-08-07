@@ -25,7 +25,7 @@ class _MapScreenState extends State<MapScreen> {
   bool _isLoading = true;
   bool _isRouting = false;
   String _riskLabel = 'Low Risk (94% Safe)';
-  Color _riskColor = AppColors.neonGreen;
+  Color _riskColor = AppColors.neonPurple;
   String _geofenceLabel = 'GEOFENCE: SAFE ZONE';
   List<PoliceStation> _policeStations = [];
   List<LatLng> _routePoints = [];
@@ -64,7 +64,7 @@ class _MapScreenState extends State<MapScreen> {
         setState(() {
           if (risk <= 3) {
             _riskLabel = 'Low Risk (${100 - risk * 6}% Safe)';
-            _riskColor = AppColors.neonGreen;
+            _riskColor = AppColors.neonPurple;
             _geofenceLabel = 'GEOFENCE: SAFE ZONE';
           } else if (risk <= 6) {
             _riskLabel = 'Medium Risk (${100 - risk * 8}% Safe)';
@@ -137,10 +137,10 @@ class _MapScreenState extends State<MapScreen> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.neonCyan.withValues(alpha: 0.15),
-                        border: Border.all(color: AppColors.neonCyan.withValues(alpha: 0.4)),
+                        color: AppColors.accentPink.withValues(alpha: 0.15),
+                        border: Border.all(color: AppColors.accentPink.withValues(alpha: 0.4)),
                       ),
-                      child: const Icon(Icons.my_location, color: AppColors.neonCyan, size: 20),
+                      child: const Icon(Icons.my_location, color: AppColors.accentPink, size: 20),
                     ),
                   ),
                 ],
@@ -152,7 +152,7 @@ class _MapScreenState extends State<MapScreen> {
                 height: 340,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.neonCyan.withValues(alpha: 0.3)),
+                  border: Border.all(color: AppColors.accentPink.withValues(alpha: 0.3)),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Stack(
@@ -173,8 +173,8 @@ class _MapScreenState extends State<MapScreen> {
                             CircleMarker(
                               point: _currentLocation,
                               radius: 100,
-                              color: AppColors.neonCyan.withValues(alpha: 0.1),
-                              borderColor: AppColors.neonCyan,
+                              color: AppColors.neonPurple.withValues(alpha: 0.1),
+                              borderColor: AppColors.neonPurple,
                               borderStrokeWidth: 2,
                             ),
                           ],
@@ -245,7 +245,7 @@ class _MapScreenState extends State<MapScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           color: AppColors.cardDark.withValues(alpha: 0.9),
-                          border: Border.all(color: AppColors.neonCyan.withValues(alpha: 0.4)),
+                          border: Border.all(color: AppColors.accentPink.withValues(alpha: 0.4)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -258,7 +258,7 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                     ),
                     if (_isLoading)
-                      const Center(child: CircularProgressIndicator(color: AppColors.neonCyan)),
+                      const Center(child: CircularProgressIndicator(color: AppColors.accentPink)),
                   ],
                 ),
               ),
@@ -272,7 +272,7 @@ class _MapScreenState extends State<MapScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    gradient: const LinearGradient(colors: [AppColors.neonCyan, AppColors.neonPurple]),
+                    gradient: const LinearGradient(colors: [AppColors.accentPink, AppColors.neonPurple]),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -299,7 +299,7 @@ class _MapScreenState extends State<MapScreen> {
               Row(
                 children: [
                   Text('Local Area Safety Analysis ', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                  const Icon(Icons.verified_user, color: AppColors.neonCyan, size: 20),
+                  const Icon(Icons.verified_user, color: AppColors.accentPink, size: 20),
                 ],
               ),
               const SizedBox(height: 12),

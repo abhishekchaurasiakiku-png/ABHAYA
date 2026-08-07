@@ -44,12 +44,12 @@ class GlassmorphicCard extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.cardDark.withValues(alpha: 0.7),
-                    AppColors.surface.withValues(alpha: 0.5),
+                    AppColors.surface.withValues(alpha: 0.8),
+                    AppColors.cardDark.withValues(alpha: 0.6),
                   ],
                 ),
                 border: Border.all(
-                  color: borderColor ?? AppColors.cardBorder.withValues(alpha: 0.4),
+                  color: borderColor ?? AppColors.cardBorder.withValues(alpha: 0.6),
                   width: 1,
                 ),
               ),

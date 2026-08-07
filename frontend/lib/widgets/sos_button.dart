@@ -83,7 +83,7 @@ class _SosButtonState extends State<SosButton> {
                 height: 160,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.sosPink.withValues(alpha: 0.08),
+                  color: AppColors.sosPink.withValues(alpha: 0.1),
                 ),
               ),
               Container(
@@ -91,7 +91,7 @@ class _SosButtonState extends State<SosButton> {
                 height: 140,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.sosPink.withValues(alpha: 0.12),
+                  color: AppColors.neonPurple.withValues(alpha: 0.15),
                 ),
               ),
               // Main button
@@ -102,12 +102,12 @@ class _SosButtonState extends State<SosButton> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: const RadialGradient(
-                    colors: [Color(0xFFFF4B6E), Color(0xFFFF2D55), Color(0xFFD91A40)],
-                    stops: [0.0, 0.5, 1.0],
+                    colors: [AppColors.accentPink, AppColors.sosPink, AppColors.neonPurple],
+                    stops: [0.0, 0.4, 1.0],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.sosPink.withValues(alpha: 0.5),
+                      color: AppColors.neonPurple.withValues(alpha: 0.5),
                       blurRadius: _isPressed ? 15 : 30,
                       spreadRadius: _isPressed ? 2 : 8,
                     ),

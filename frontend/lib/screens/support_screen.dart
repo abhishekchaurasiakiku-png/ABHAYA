@@ -88,7 +88,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   Expanded(
                     child: Text("24/7 Rapid Response Helplines ", style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
-                  const Icon(Icons.phone, color: AppColors.neonCyan, size: 18),
+                  const Icon(Icons.phone, color: AppColors.accentPink, size: 18),
                 ],
               ),
               const SizedBox(height: 14),
@@ -104,10 +104,10 @@ class _SupportScreenState extends State<SupportScreen> {
                   crossAxisSpacing: 12,
                 ),
                 children: [
-                  HelplineCard(number: '1091', title: 'Women Helpline', subtitle: 'National Support', accentColor: AppColors.neonGreen, onCall: () => _dial('1091')),
+                  HelplineCard(number: '1091', title: 'Women Helpline', subtitle: 'National Support', accentColor: AppColors.accentPink, onCall: () => _dial('1091')),
                   HelplineCard(number: '181', title: 'Abuse Helpline', subtitle: 'Domestic Support', accentColor: AppColors.neonPurple, onCall: () => _dial('181')),
-                  HelplineCard(number: '112', title: 'Police Force', subtitle: 'Immediate Emergency', accentColor: AppColors.neonCyan, onCall: () => _dial('112')),
-                  HelplineCard(number: '108', title: 'Ambulance & M...', subtitle: 'Medical Response', accentColor: Colors.orange, onCall: () => _dial('108')),
+                  HelplineCard(number: '112', title: 'Police Force', subtitle: 'Immediate Emergency', accentColor: AppColors.neonPurple, onCall: () => _dial('112')),
+                  HelplineCard(number: '108', title: 'Ambulance & M...', subtitle: 'Medical Response', accentColor: AppColors.accentPink, onCall: () => _dial('108')),
                 ],
               ),
               const SizedBox(height: 28),
@@ -137,20 +137,20 @@ class _SupportScreenState extends State<SupportScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            color: isSelected ? AppColors.neonCyan.withValues(alpha: 0.2) : AppColors.cardDark,
-                            border: Border.all(color: isSelected ? AppColors.neonCyan : AppColors.cardBorder.withValues(alpha: 0.3)),
+                            color: isSelected ? AppColors.neonPurple.withValues(alpha: 0.2) : AppColors.cardDark,
+                            border: Border.all(color: isSelected ? AppColors.neonPurple : AppColors.cardBorder.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (filter == 'Voice') const Icon(Icons.mic, size: 13, color: AppColors.neonPurple),
-                              if (filter == 'Motion') const Icon(Icons.directions_walk, size: 13, color: AppColors.neonCyan),
+                              if (filter == 'Motion') const Icon(Icons.directions_walk, size: 13, color: AppColors.neonPurple),
                               if (filter == 'SOS') const Icon(Icons.sos, size: 13, color: AppColors.sosPink),
                               if (filter != 'All' && filter != 'Manual') const SizedBox(width: 4),
                               Text(
                                 filter,
                                 style: GoogleFonts.poppins(
-                                  color: isSelected ? AppColors.neonCyan : AppColors.textSecondary,
+                                  color: isSelected ? AppColors.neonPurple : AppColors.textSecondary,
                                   fontSize: 12,
                                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                                 ),
@@ -169,7 +169,7 @@ class _SupportScreenState extends State<SupportScreen> {
               if (_isLoading)
                 const Center(child: Padding(
                   padding: EdgeInsets.all(20),
-                  child: CircularProgressIndicator(color: AppColors.neonCyan),
+                  child: CircularProgressIndicator(color: AppColors.accentPink),
                 ))
               else if (_filteredIncidents.isEmpty)
                 Center(
@@ -177,10 +177,10 @@ class _SupportScreenState extends State<SupportScreen> {
                     padding: const EdgeInsets.all(30),
                     child: Column(
                       children: [
-                        Icon(Icons.shield, color: AppColors.neonGreen.withValues(alpha: 0.5), size: 40),
+                        Icon(Icons.shield, color: AppColors.neonPurple.withValues(alpha: 0.5), size: 40),
                         const SizedBox(height: 10),
                         Text('No incidents recorded', style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13)),
-                        Text('Your safety log is clear!', style: GoogleFonts.poppins(color: AppColors.neonGreen, fontSize: 12)),
+                        Text('Your safety log is clear!', style: GoogleFonts.poppins(color: AppColors.neonPurple, fontSize: 12)),
                       ],
                     ),
                   ),

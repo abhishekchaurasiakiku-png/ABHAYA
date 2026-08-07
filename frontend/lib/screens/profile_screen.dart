@@ -126,8 +126,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 60,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: const LinearGradient(colors: [AppColors.neonPurple, AppColors.sosPink]),
-                          border: Border.all(color: AppColors.neonPurple, width: 2),
+                          gradient: const LinearGradient(colors: [AppColors.accentPink, AppColors.neonPurple]),
+                          border: Border.all(color: AppColors.accentPink, width: 2),
                           image: _profileImageUrl != null
                               ? DecorationImage(
                                   image: NetworkImage('${AppConstants.baseUrl}$_profileImageUrl'),
@@ -155,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 padding: const EdgeInsets.all(2),
                                 decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppColors.neonGreen,
+                                  color: AppColors.neonPurple,
                                 ),
                                 child: const Icon(Icons.camera_alt, color: Colors.white, size: 12),
                               ),
@@ -201,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     IconButton(
                       onPressed: () {},
-                      icon: const Icon(Icons.tune, color: AppColors.neonCyan, size: 22),
+                      icon: const Icon(Icons.tune, color: AppColors.accentPink, size: 22),
                     ),
                   ],
                 ),
@@ -227,9 +227,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Text('Emergency & Medical Details', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(Icons.edit, color: AppColors.neonCyan, size: 16),
+                    const Icon(Icons.edit, color: AppColors.accentPink, size: 16),
                     const SizedBox(width: 4),
-                    Text('Edit Details', style: GoogleFonts.poppins(color: AppColors.neonCyan, fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text('Edit Details', style: GoogleFonts.poppins(color: AppColors.accentPink, fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -248,19 +248,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       iconColor: AppColors.sosPink,
                       title: 'Blood Group & Vital Info',
                       subtitle: 'Blood Group: $_bloodGroup (Tap Edit)',
-                      subtitleColor: AppColors.neonGreen,
+                      subtitleColor: AppColors.accentPink,
                     ),
                     const Divider(color: AppColors.cardBorder, height: 24),
                     _buildMedicalRow(
                       icon: Icons.medical_services,
-                      iconColor: AppColors.neonCyan,
+                      iconColor: AppColors.neonPurple,
                       title: 'Medical Notes / Allergies (ER Ready)',
                       subtitle: _medicalNotes,
                     ),
                     const Divider(color: AppColors.cardBorder, height: 24),
                     _buildMedicalRow(
                       icon: Icons.home,
-                      iconColor: Colors.blue,
+                      iconColor: AppColors.neonPurple,
                       title: 'Home Address',
                       subtitle: _homeAddress,
                     ),
@@ -270,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const Divider(color: AppColors.cardBorder, height: 24),
                           _buildMedicalRow(
                             icon: Icons.work,
-                            iconColor: Colors.orange,
+                            iconColor: AppColors.accentPink,
                             title: 'Work / School Address',
                             subtitle: _workAddress,
                           ),

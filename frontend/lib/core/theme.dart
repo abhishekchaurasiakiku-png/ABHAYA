@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color background = Color(0xFF0A0E21);
-  static const Color surface = Color(0xFF1A1A2E);
-  static const Color cardDark = Color(0xFF16213E);
-  static const Color cardBorder = Color(0xFF2A2D5E);
-  static const Color sosPink = Color(0xFFFF2D55);
-  static const Color neonCyan = Color(0xFF00E5FF);
-  static const Color neonPurple = Color(0xFFBB86FC);
+  static const Color background = Color(0xFF120E1F);
+  static const Color surface = Color(0xFF1C152B);
+  static const Color cardDark = Color(0xFF251C37);
+  static const Color cardBorder = Color(0xFF4A3B69);
+  static const Color sosPink = Color(0xFFFF3366);
+  static const Color neonCyan = Color(0xFF00E5FF); // Kept for legacy/minor accents if needed
+  static const Color neonPurple = Color(0xFF9D4EDD);
   static const Color neonGreen = Color(0xFF00E676);
+  static const Color accentPink = Color(0xFFFF758F);
   static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Color(0xFF8E8EA0);
-  static const Color navBar = Color(0xFF0D1025);
+  static const Color textSecondary = Color(0xFFA594BD);
+  static const Color navBar = Color(0xFF120E1F);
 }
 
 class AppTheme {

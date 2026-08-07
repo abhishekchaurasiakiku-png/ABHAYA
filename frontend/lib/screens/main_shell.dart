@@ -194,14 +194,14 @@ class _MainShellState extends State<MainShell> {
           children: [
             Icon(
               icon,
-              color: actualSelected ? AppColors.neonCyan : AppColors.textSecondary,
+              color: actualSelected ? AppColors.accentPink : AppColors.textSecondary,
               size: 22,
             ),
             const SizedBox(height: 2),
             Text(
               label,
               style: GoogleFonts.poppins(
-                color: actualSelected ? AppColors.neonCyan : AppColors.textSecondary,
+                color: actualSelected ? AppColors.accentPink : AppColors.textSecondary,
                 fontSize: 10,
                 fontWeight: actualSelected ? FontWeight.w600 : FontWeight.w400,
               ),
