@@ -13,7 +13,7 @@ class AppConstants {
       // If configured for 10.0.2.2 (Android Emulator) but running on Windows/Web/Desktop/iOS, use localhost
       final isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
       if (envUrl.contains('10.0.2.2') && !isAndroid) {
-        return envUrl.replaceAll('10.0.2.2', 'localhost');
+        return envUrl.replaceAll('10.0.2.2', '127.0.0.1');
       }
       return envUrl;
     }
