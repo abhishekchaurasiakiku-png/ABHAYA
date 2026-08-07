@@ -20,11 +20,18 @@ class _SosButtonState extends State<SosButton> {
     if (_isSending) return;
     setState(() { _isPressed = true; _isSending = true; });
 
+    double lat = 0.0;
+    double lng = 0.0;
+
     try {
       final position = await _locationService.getCurrentLocation();
-      final lat = position?.latitude ?? 0.0;
-      final lng = position?.longitude ?? 0.0;
+      lat = position?.latitude ?? 0.0;
+      lng = position?.longitude ?? 0.0;
+    } catch (e) {
+      // Ignore location failure and proceed with 0.0, 0.0
+    }
 
+    try {
       await _sosService.triggerSos(
         triggerType: 'Manual',
         latitude: lat,
@@ -45,7 +52,7 @@ class _SosButtonState extends State<SosButton> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Alert sent (offline mode)', style: GoogleFonts.poppins()),
+            content: Text('Alert failed: check connection', style: GoogleFonts.poppins()),
             backgroundColor: Colors.orange,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

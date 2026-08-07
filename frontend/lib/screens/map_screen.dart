@@ -82,6 +82,11 @@ class _MapScreenState extends State<MapScreen> {
     if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
+  void _findPoliceStation() async {
+    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=police+station');
+    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -215,6 +220,28 @@ class _MapScreenState extends State<MapScreen> {
                       const Icon(Icons.navigation, color: Colors.white, size: 20),
                       const SizedBox(width: 8),
                       Text('Launch Live Navigation in Google', style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              
+              // Police Station AI Button
+              GestureDetector(
+                onTap: _findPoliceStation,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    gradient: const LinearGradient(colors: [Colors.indigo, Colors.blueAccent]),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.local_police, color: Colors.white, size: 20),
+                      const SizedBox(width: 8),
+                      Text('Find Nearest Police Station (AI)', style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),

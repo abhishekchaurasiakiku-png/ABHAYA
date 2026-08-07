@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import '../core/theme.dart';
 import '../services/incident_service.dart';
+import '../services/encrypted_storage_service.dart';
 import '../widgets/helpline_card.dart';
 import '../widgets/incident_log_tile.dart';
 
@@ -15,6 +16,7 @@ class SupportScreen extends StatefulWidget {
 
 class _SupportScreenState extends State<SupportScreen> {
   final IncidentService _incidentService = IncidentService();
+  final EncryptedStorageService _encryptedStorage = EncryptedStorageService();
   List<dynamic> _incidents = [];
   bool _isLoading = true;
   String _selectedFilter = 'All';
@@ -29,8 +31,28 @@ class _SupportScreenState extends State<SupportScreen> {
 
   void _loadIncidents() async {
     try {
+      // First, load encrypted logs from local device
+      final localIncidents = await _encryptedStorage.loadIncidents();
+      if (mounted && localIncidents.isNotEmpty) {
+        setState(() {
+          _incidents = localIncidents;
+          _isLoading = false;
+        });
+      }
+
+      // Then sync with the server
       final data = await _incidentService.getIncidents();
-      if (mounted) setState(() { _incidents = data['incidents'] ?? []; _isLoading = false; });
+      final fetchedIncidents = data['incidents'] ?? [];
+      
+      // Save synced logs to encrypted local storage
+      await _encryptedStorage.saveIncidents(fetchedIncidents);
+
+      if (mounted) {
+        setState(() { 
+          _incidents = fetchedIncidents; 
+          _isLoading = false; 
+        });
+      }
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -42,8 +64,7 @@ class _SupportScreenState extends State<SupportScreen> {
   }
 
   void _dial(String number) async {
-    final uri = Uri.parse('tel:$number');
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
+    await FlutterPhoneDirectCaller.callNumber(number);
   }
 
   @override

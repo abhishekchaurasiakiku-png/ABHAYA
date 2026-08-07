@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongooseFieldEncryption = require('mongoose-field-encryption').fieldEncryption;
 
 const incidentSchema = new mongoose.Schema({
   userId: {
@@ -55,5 +56,13 @@ incidentSchema.index({ location: '2dsphere' });
 
 // Compound index for user-specific queries
 incidentSchema.index({ userId: 1, timestamp: -1 });
+
+incidentSchema.plugin(mongooseFieldEncryption, { 
+  fields: ['notes', 'locationHistory'], 
+  secret: process.env.ENCRYPTION_KEY || 'default_secret_key_123456789012',
+  saltGenerator: function (secret) {
+    return '1234567890123456';
+  }
+});
 
 module.exports = mongoose.model('Incident', incidentSchema);
