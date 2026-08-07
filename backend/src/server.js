@@ -205,20 +205,56 @@ mongoose.connection.on('error', (err) => {
   console.error('❌ MongoDB connection error:', err.message);
 });
 
-// ─── Start Server ───────────────────────────────────────────
-// IMPORTANT: Connect to MongoDB FIRST, then start listening.
-// This prevents 500 errors when requests arrive before MongoDB is ready.
+// Function to attempt listening on a port, falling back to next available port if EADDRINUSE
+function listenWithRetry(startPort, maxAttempts = 20) {
+  return new Promise((resolve, reject) => {
+    const basePort = parseInt(startPort, 10) || 3000;
+    const maxPort = basePort + maxAttempts;
+
+    function attemptListen(port) {
+      if (port >= maxPort) {
+        return reject(new Error(`No open port found in range ${basePort}-${maxPort - 1}`));
+      }
+
+      const onError = (err) => {
+        if (err.code === 'EADDRINUSE') {
+          console.warn(`⚠️ Port ${port} is already in use, retrying on port ${port + 1}...`);
+          server.removeListener('listening', onListening);
+          attemptListen(port + 1);
+        } else {
+          server.removeListener('listening', onListening);
+          reject(err);
+        }
+      };
+
+      const onListening = () => {
+        server.removeListener('error', onError);
+        resolve(port);
+      };
+
+      server.once('error', onError);
+      server.once('listening', onListening);
+      server.listen(port);
+    }
+
+    attemptListen(basePort);
+  });
+}
+
 async function startServer() {
   // Connect to MongoDB first
   await connectWithRetry();
 
-  // Then start accepting HTTP requests
-  server.listen(PORT, () => {
-    console.log(`🚀 SafeHer-AI Backend running on port ${PORT}`);
-    console.log(`📡 WebSocket server ready at ws://localhost:${PORT}/tracking`);
+  try {
+    const boundPort = await listenWithRetry(PORT);
+    console.log(`🚀 SafeHer-AI Backend running on port ${boundPort}`);
+    console.log(`📡 WebSocket server ready at ws://localhost:${boundPort}/tracking`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`📊 MongoDB state: ${mongoose.connection.readyState === 1 ? 'connected' : 'not connected'}`);
-  });
+  } catch (err) {
+    console.error('❌ Failed to start server:', err.message);
+    process.exit(1);
+  }
 }
 
 startServer();
