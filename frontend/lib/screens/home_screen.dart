@@ -9,6 +9,7 @@ import '../widgets/sos_button.dart';
 import '../widgets/glassmorphic_card.dart';
 import '../widgets/quick_action_button.dart';
 import '../widgets/safety_toolkit_tile.dart';
+import '../services/user_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,8 +30,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _loadUserName() async {
-    final name = await AuthService().getUserName();
-    if (mounted) setState(() => _userName = name);
+    try {
+      final data = await UserService().getProfile();
+      if (mounted) setState(() => _userName = data['name'] ?? 'User');
+    } catch (e) {
+      final name = await AuthService().getUserName();
+      if (mounted) setState(() => _userName = name);
+    }
   }
 
   @override

@@ -91,3 +91,33 @@ exports.updateFcmToken = async (req, res) => {
     res.status(500).json({ error: 'Failed to update FCM token' });
   }
 };
+
+/**
+ * POST /api/users/profile-image
+ * Uploads a profile image and updates the user's profileImage field.
+ */
+exports.uploadProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file uploaded' });
+    }
+
+    // Construct the public URL path
+    const imageUrl = `/uploads/${req.file.filename}`;
+
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { $set: { profileImage: imageUrl } },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ message: 'Profile image uploaded successfully', profileImage: imageUrl });
+  } catch (err) {
+    console.error('[User] Image upload error:', err.message);
+    res.status(500).json({ error: 'Failed to upload profile image' });
+  }
+};

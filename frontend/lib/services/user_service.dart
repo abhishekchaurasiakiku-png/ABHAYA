@@ -17,4 +17,8 @@ class UserService {
   Future<Map<String, dynamic>> updateContacts(List<Map<String, dynamic>> contacts) async {
     return await _api.put('/api/users/contacts', {'emergencyContacts': contacts});
   }
+
+  Future<Map<String, dynamic>> uploadProfileImage(String imagePath) async {
+    return await _api.multipartPost('/api/users/profile-image', 'image', imagePath);
+  }
 }

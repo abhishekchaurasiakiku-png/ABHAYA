@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import '../core/constants.dart';
 import '../core/theme.dart';
 import '../services/user_service.dart';
 import '../services/auth_service.dart';
@@ -21,7 +24,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _bloodGroup = 'Not set';
   String _medicalNotes = 'No allergies or medical notes recorded yet.';
   String _homeAddress = 'Set residence address for automated arrival check-ins.';
+  String? _profileImageUrl;
   bool _isLoading = true;
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -46,6 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _name = data['name'] ?? _name;
           _email = data['email'] ?? _email;
           _phone = data['phone'] ?? _phone;
+          _profileImageUrl = data['profileImage'];
           _isLoading = false;
         });
       }
@@ -57,6 +63,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _logout() async {
     await AuthService().logout();
     if (mounted) Navigator.pushReplacementNamed(context, '/login');
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() => _isUploading = true);
+      try {
+        final result = await _userService.uploadProfileImage(pickedFile.path);
+        if (mounted) {
+          setState(() {
+            _profileImageUrl = result['profileImage'];
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to upload image: $e')),
+          );
+        }
+      } finally {
+        if (mounted) setState(() => _isUploading = false);
+      }
+    }
   }
 
   @override
@@ -80,35 +111,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Row(
                   children: [
                     // Avatar
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const LinearGradient(colors: [AppColors.neonPurple, AppColors.sosPink]),
-                        border: Border.all(color: AppColors.neonPurple, width: 2),
-                      ),
-                      child: Stack(
-                        children: [
-                          Center(
-                            child: Text(
-                              _name.isNotEmpty ? _name[0].toUpperCase() : 'U',
-                              style: GoogleFonts.poppins(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.neonGreen,
+                    GestureDetector(
+                      onTap: _pickAndUploadImage,
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(colors: [AppColors.neonPurple, AppColors.sosPink]),
+                          border: Border.all(color: AppColors.neonPurple, width: 2),
+                          image: _profileImageUrl != null
+                              ? DecorationImage(
+                                  image: NetworkImage('${AppConstants.baseUrl}$_profileImageUrl'),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                        ),
+                        child: Stack(
+                          children: [
+                            if (_profileImageUrl == null)
+                              Center(
+                                child: Text(
+                                  _name.isNotEmpty ? _name[0].toUpperCase() : 'U',
+                                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                                ),
                               ),
-                              child: const Icon(Icons.camera_alt, color: Colors.white, size: 12),
+                            if (_isUploading)
+                              const Center(
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.neonGreen,
+                                ),
+                                child: const Icon(Icons.camera_alt, color: Colors.white, size: 12),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(width: 14),
