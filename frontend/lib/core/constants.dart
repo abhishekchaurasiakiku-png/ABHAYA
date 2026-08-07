@@ -1,13 +1,12 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AppConstants {
   static const String appName = 'A.B.H.A.Y.A';
   static const String sosMessage = 'I am in danger! Please help.';
 
   // Backend API
-  // 1. For local testing on Android emulator, use this:
-  // static const String baseUrl = 'http://10.0.2.2:3000';
-  
-  // 2. For LIVE testing with your MongoDB Cluster / Render backend, use your Render URL:
-  static const String baseUrl = 'https://safeher-ai-backend.onrender.com'; // Replace with YOUR actual Render URL!
+  // Reads RENDER_API_URL from frontend/.env file. If not found, defaults to Render URL.
+  static String get baseUrl => dotenv.env['RENDER_API_URL'] ?? 'https://safeher-ai-backend.onrender.com';
 
   // Helplines
   static const String womenHelpline = '1091';
