@@ -3,8 +3,11 @@ class AppConstants {
   static const String sosMessage = 'I am in danger! Please help.';
 
   // Backend API
-  static const String baseUrl = 'http://10.0.2.2:3000'; // Android emulator
-  // static const String baseUrl = 'http://127.0.0.1:3000'; // Windows/Web
+  // 1. For local testing on Android emulator, use this:
+  // static const String baseUrl = 'http://10.0.2.2:3000';
+  
+  // 2. For LIVE testing with your MongoDB Cluster / Render backend, use your Render URL:
+  static const String baseUrl = 'https://safeher-ai-backend.onrender.com'; // Replace with YOUR actual Render URL!
 
   // Helplines
   static const String womenHelpline = '1091';
