@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import '../core/theme.dart';
 import '../services/location_service.dart';
 import '../services/map_service.dart';
@@ -48,6 +49,7 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
   @override
   void dispose() {
     _tripService.stopMonitoring();
+    WakelockPlus.disable();
     super.dispose();
   }
 
@@ -85,6 +87,7 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
   void _toggleTrip() {
     if (_isMonitoring) {
       _tripService.stopMonitoring();
+      WakelockPlus.disable();
       setState(() {
         _isMonitoring = false;
         _destination = null;
@@ -96,6 +99,7 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
         return;
       }
       _tripService.startMonitoring(_routePoints);
+      WakelockPlus.enable();
       setState(() {
         _isMonitoring = true;
       });
