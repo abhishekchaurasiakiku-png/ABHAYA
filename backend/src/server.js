@@ -1,11 +1,13 @@
 require('dotenv').config();
 const dns = require('dns');
 
-// Configure fallback DNS servers (Google & Cloudflare) to prevent querySrv ECONNREFUSED on local networks
-try {
-  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
-} catch (e) {
-  console.warn('⚠️ Could not set custom DNS servers:', e.message);
+// Configure fallback DNS servers on local networks (bypassed on cloud environments like Render)
+if (!process.env.RENDER && process.env.NODE_ENV !== 'production') {
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+  } catch (e) {
+    console.warn('⚠️ Could not set custom DNS servers:', e.message);
+  }
 }
 
 const express = require('express');
