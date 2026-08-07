@@ -5,21 +5,24 @@ import '../services/auth_service.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/glass_container.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = AuthService();
   bool _isLoading = false;
 
-  void _login() async {
+  void _register() async {
     setState(() => _isLoading = true);
+    // Add real register logic here in the future
+    await Future.delayed(const Duration(seconds: 1));
     bool success = await _authService.login(
       _emailController.text,
       _passwordController.text,
@@ -31,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login failed. Please try again.')),
+          const SnackBar(content: Text('Registration failed. Please try again.')),
         );
       }
     }
@@ -44,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF8A2387), Color(0xFFE94057), Color(0xFFF27121)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.bottomRight,
+            end: Alignment.topLeft,
           ),
         ),
         child: SafeArea(
@@ -58,47 +61,53 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
-                      Icons.shield_rounded,
-                      size: 80,
+                      Icons.person_add_rounded,
+                      size: 60,
                       color: Colors.white,
                     ).animate().fadeIn(duration: 600.ms).scale(),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                     const Text(
-                      'Welcome Back',
+                      'Create Account',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 26,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
                     const SizedBox(height: 8),
                     const Text(
-                      'Sign in to A.B.H.A.Y.A',
+                      'Join A.B.H.A.Y.A today',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.white70,
                       ),
                     ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2, end: 0),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 32),
+                    CustomTextField(
+                      controller: _nameController,
+                      label: 'Full Name',
+                      icon: Icons.person_outline,
+                    ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.2, end: 0),
+                    const SizedBox(height: 16),
                     CustomTextField(
                       controller: _emailController,
                       label: 'Email',
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
-                    ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.2, end: 0),
-                    const SizedBox(height: 20),
+                    ).animate().fadeIn(delay: 500.ms).slideX(begin: 0.2, end: 0),
+                    const SizedBox(height: 16),
                     CustomTextField(
                       controller: _passwordController,
                       label: 'Password',
                       icon: Icons.lock_outline,
                       isPassword: true,
-                    ).animate().fadeIn(delay: 500.ms).slideX(begin: 0.2, end: 0),
+                    ).animate().fadeIn(delay: 600.ms).slideX(begin: -0.2, end: 0),
                     const SizedBox(height: 40),
                     SizedBox(
                       width: double.infinity,
                       height: 55,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _login,
+                        onPressed: _isLoading ? null : _register,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: const Color(0xFFE94057),
@@ -110,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: _isLoading
                             ? const CircularProgressIndicator()
                             : const Text(
-                                'LOGIN',
+                                'REGISTER',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -118,21 +127,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                       ),
-                    ).animate().fadeIn(delay: 600.ms).scale(),
+                    ).animate().fadeIn(delay: 700.ms).scale(),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          "Don't have an account?",
+                          "Already have an account?",
                           style: TextStyle(color: Colors.white70),
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, AppRoutes.register);
+                            Navigator.pop(context);
                           },
                           child: const Text(
-                            'Sign Up',
+                            'Log In',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -140,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ],
-                    ).animate().fadeIn(delay: 700.ms),
+                    ).animate().fadeIn(delay: 800.ms),
                   ],
                 ),
               ),
