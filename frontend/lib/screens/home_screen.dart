@@ -15,6 +15,7 @@ import '../widgets/quick_action_button.dart';
 import '../widgets/safety_toolkit_tile.dart';
 import '../services/user_service.dart';
 import '../services/sos_service.dart';
+import '../services/location_service.dart';
 import 'map_screen.dart';
 import 'trip_monitor_screen.dart';
 
@@ -359,7 +360,15 @@ class _HomeScreenState extends State<HomeScreen> {
           const SnackBar(content: Text('Sharing location with trusted contacts...')),
         );
       }
-      final position = await Geolocator.getCurrentPosition();
+      final position = await LocationService().getCurrentLocation();
+      if (position == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permission denied or service disabled')),
+          );
+        }
+        return;
+      }
       await SosService().shareLiveLocation(position.latitude, position.longitude);
       
       if (mounted) {

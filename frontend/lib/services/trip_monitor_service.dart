@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'sos_service.dart';
+import 'location_service.dart';
 
 class TripMonitorService {
   StreamSubscription<Position>? _positionStream;
@@ -21,18 +22,19 @@ class TripMonitorService {
   Function(int)? onStrikeUpdated;
   Function()? onSosTriggered;
 
-  void startMonitoring(List<LatLng> route) {
+  void startMonitoring(List<LatLng> route) async {
     _expectedRoute = route;
     _isMonitoring = true;
     _strikeCount = 0;
     _isPrompting = false;
 
-    _positionStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
-      ),
-    ).listen((Position position) {
+    final stream = await LocationService().getLocationStream();
+    if (stream == null) {
+      // Permission denied
+      return;
+    }
+
+    _positionStream = stream.listen((Position position) {
       if (!_isMonitoring || _isPrompting) return;
       _checkDeviation(LatLng(position.latitude, position.longitude));
     });
@@ -92,12 +94,14 @@ class TripMonitorService {
     if (onSosTriggered != null) onSosTriggered!();
     
     try {
-      final pos = await Geolocator.getCurrentPosition();
-      await SosService().triggerSos(
-        triggerType: 'Route Deviation',
-        latitude: pos.latitude,
-        longitude: pos.longitude,
-      );
+      final pos = await LocationService().getCurrentLocation();
+      if (pos != null) {
+        await SosService().triggerSos(
+          triggerType: 'Route Deviation',
+          latitude: pos.latitude,
+          longitude: pos.longitude,
+        );
+      }
     } catch (e) {
       // Auto SOS failed
     }
