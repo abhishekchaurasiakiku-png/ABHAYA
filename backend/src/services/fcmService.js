@@ -1,29 +1,9 @@
 /**
  * Firebase Cloud Messaging (FCM) service for push notifications.
- * 
- * Dispatches SOS alerts to guardians with < 2 second target latency.
- * 
- * Setup:
- * 1. Download your Firebase Admin SDK service account JSON
- * 2. Set FIREBASE_CREDENTIALS_PATH in .env
- * 3. Uncomment the Firebase initialization below
+ * Operating in Mock mode (Firebase Admin credentials disabled).
  */
 
-const admin = require('firebase-admin');
-const path = require('path');
-const fs = require('fs');
-
-// Initialize Firebase Admin
-const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
-if (credentialsPath && fs.existsSync(path.resolve(credentialsPath))) {
-  const serviceAccount = require(path.resolve(credentialsPath));
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-  console.log('✅ Firebase Admin initialized');
-} else {
-  console.log('⚠️ Firebase Admin credentials not found or invalid. FCM will run in Mock mode.');
-}
+console.log('ℹ️ FCM running in Mock mode (Firebase Admin disabled for Render deployment)');
 
 /**
  * Send SOS notification to a guardian via FCM.
@@ -80,19 +60,7 @@ exports.sendSosNotification = async (fcmToken, data) => {
     },
   };
 
-  // Production with active FCM admin SDK (fallback to mock mode if credentials not loaded)
-  try {
-    if (admin.apps.length > 0) {
-      const response = await admin.messaging().send(message);
-      console.log(`[FCM] ✅ Notification sent: ${response}`);
-      return response;
-    }
-  } catch (err) {
-    console.error(`[FCM] ❌ Failed to send active FCM notification: ${err.message}`);
-    throw err;
-  }
-
-  // Development fallback/placeholder
+  // Mock mode notification output
   console.log(`[FCM] 📨 [Mock Mode] Would send SOS notification to token: ${fcmToken.substring(0, 20)}...`);
   console.log(`[FCM]    Data: ${JSON.stringify(data)}`);
   return 'mock-message-id';
@@ -103,38 +71,6 @@ exports.sendSosNotification = async (fcmToken, data) => {
  */
 exports.sendResolutionNotification = async (fcmToken, data) => {
   if (!fcmToken) return;
-
-  const message = {
-    token: fcmToken,
-    notification: {
-      title: '✅ SOS Resolved',
-      body: `${data.userName}'s emergency status has been resolved safely.`,
-    },
-    data: {
-      type: 'sos_resolved',
-      incidentId: data.incidentId,
-      timestamp: new Date().toISOString(),
-    },
-    android: {
-      priority: 'high',
-      notification: {
-        channelId: 'sos_channel',
-        sound: 'default',
-        clickAction: 'FLUTTER_NOTIFICATION_CLICK',
-      },
-    },
-  };
-
-  try {
-    if (admin.apps.length > 0) {
-      const response = await admin.messaging().send(message);
-      console.log(`[FCM] ✅ Resolution sent: ${response}`);
-      return response;
-    }
-  } catch (err) {
-    console.error(`[FCM] ❌ Failed to send active FCM resolution: ${err.message}`);
-    throw err;
-  }
 
   console.log(`[FCM] 📨 [Mock Mode] Would send resolution to: ${fcmToken?.substring(0, 20)}...`);
   return 'mock-message-id';
