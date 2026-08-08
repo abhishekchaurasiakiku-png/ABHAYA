@@ -11,8 +11,8 @@ class AppColors {
   static const Color neonPurple = Color(0xFF9D4EDD);
   static const Color neonGreen = Color(0xFF00E676);
   static const Color accentPink = Color(0xFFFF758F);
-  static const Color textPrimary = Color(0xFF251C37); // Dark purple for contrast
-  static const Color textSecondary = Color(0xFF7A6A92); // Muted purple for secondary text
+  static const Color textPrimary = Color(0xFF121212); // Deep dark for contrast on white
+  static const Color textSecondary = Color(0xFF555555); // Dark grey for secondary text
   static const Color navBar = Color(0xFFFFFFFF);
 }
 

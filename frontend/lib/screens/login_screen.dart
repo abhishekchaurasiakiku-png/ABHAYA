@@ -49,13 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.background, Color(0xFF1A1A2E)],
-          ),
-        ),
+        color: AppColors.background,
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -132,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () => setState(() { _isLogin = !_isLogin; _error = null; }),
                     child: Text(
                       _isLogin ? "Don't have an account? Register" : "Already have an account? Login",
-                      style: GoogleFonts.poppins(color: AppColors.neonCyan, fontSize: 13),
+                      style: GoogleFonts.poppins(color: AppColors.neonPurple, fontSize: 13),
                     ),
                   ),
                 ],
