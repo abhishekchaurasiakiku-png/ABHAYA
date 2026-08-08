@@ -52,13 +52,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         setState(() {
           _rawProfileData = data;
-          _name = data['name'] ?? _name;
-          _email = data['email'] ?? _email;
-          _phone = data['phone'] ?? _phone;
-          _bloodGroup = data['bloodGroup'] ?? 'Not set';
-          _medicalNotes = data['medicalDetails'] ?? 'No allergies or medical notes recorded yet.';
-          _homeAddress = data['homeAddress'] ?? 'Set residence address for automated arrival check-ins.';
-          _workAddress = data['workAddress'] ?? '';
+          _name = (data['name']?.toString().isNotEmpty == true) ? data['name'] : _name;
+          _email = (data['email']?.toString().isNotEmpty == true) ? data['email'] : _email;
+          _phone = (data['phone']?.toString().isNotEmpty == true) ? data['phone'] : _phone;
+          _bloodGroup = (data['bloodGroup']?.toString().isNotEmpty == true) ? data['bloodGroup'] : 'Not set';
+          _medicalNotes = (data['medicalDetails']?.toString().isNotEmpty == true) ? data['medicalDetails'] : 'No allergies or medical notes recorded yet.';
+          _homeAddress = (data['homeAddress']?.toString().isNotEmpty == true) ? data['homeAddress'] : 'Set residence address for automated arrival check-ins.';
+          _workAddress = (data['workAddress']?.toString().isNotEmpty == true) ? data['workAddress'] : '';
           _profileImageUrl = data['profileImage'];
           _isLoading = false;
         });
