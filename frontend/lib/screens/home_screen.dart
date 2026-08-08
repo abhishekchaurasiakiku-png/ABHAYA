@@ -195,34 +195,43 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 24),
 
               // Quick Actions Row
-              Wrap(
-                alignment: WrapAlignment.spaceAround,
-                spacing: 8,
-                runSpacing: 16,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  QuickActionButton(
-                    icon: Icons.phone,
-                    label: 'Emergency',
-                    iconColor: AppColors.sosPink,
-                    onTap: () => _dial('112'),
+                  Expanded(
+                    child: QuickActionButton(
+                      icon: Icons.phone,
+                      label: 'Emergency',
+                      iconColor: AppColors.sosPink,
+                      onTap: () => _dial('112'),
+                    ),
                   ),
-                  QuickActionButton(
-                    icon: Icons.support_agent,
-                    label: '1091 Wom...',
-                    iconColor: AppColors.accentPink,
-                    onTap: () => _dial('1091'),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: QuickActionButton(
+                      icon: Icons.support_agent,
+                      label: '1091 Women',
+                      iconColor: AppColors.accentPink,
+                      onTap: () => _dial('1091'),
+                    ),
                   ),
-                  QuickActionButton(
-                    icon: Icons.fiber_manual_record,
-                    label: 'Evidence',
-                    iconColor: AppColors.neonPurple,
-                    onTap: _recordEvidence,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: QuickActionButton(
+                      icon: Icons.fiber_manual_record,
+                      label: 'Evidence',
+                      iconColor: AppColors.neonPurple,
+                      onTap: _recordEvidence,
+                    ),
                   ),
-                  QuickActionButton(
-                    icon: Icons.flashlight_on,
-                    label: _isTorchOn ? 'Flash Off' : 'Flashlight',
-                    iconColor: _isTorchOn ? AppColors.sosPink : AppColors.neonPurple.withValues(alpha: 0.7),
-                    onTap: _toggleFlashlight,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: QuickActionButton(
+                      icon: Icons.flashlight_on,
+                      label: _isTorchOn ? 'Flash Off' : 'Flashlight',
+                      iconColor: _isTorchOn ? AppColors.sosPink : AppColors.neonPurple.withValues(alpha: 0.7),
+                      onTap: _toggleFlashlight,
+                    ),
                   ),
                 ],
               ),

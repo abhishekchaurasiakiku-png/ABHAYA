@@ -27,8 +27,8 @@ void onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  // Configurable thresholds for background detection
-  double shakeThresholdGravity = 2.7;
+  // Configurable thresholds for background detection (optimized for speed)
+  double shakeThresholdGravity = 2.0; // Lowered to trigger faster with normal shakes
   int minimumShakes = 3;
   Duration timeWindow = const Duration(seconds: 2);
 
@@ -64,7 +64,11 @@ void onStart(ServiceInstance service) async {
         service.invoke('sos_triggered');
 
         try {
-          final position = await locationService.getCurrentLocation();
+          // Add a strict timeout to location fetch so SOS isn't delayed if GPS is slow indoors
+          final position = await locationService.getCurrentLocation().timeout(
+            const Duration(seconds: 2), 
+            onTimeout: () => null,
+          );
           double lat = position?.latitude ?? 0.0;
           double lng = position?.longitude ?? 0.0;
           
