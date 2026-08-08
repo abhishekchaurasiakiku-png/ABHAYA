@@ -48,6 +48,7 @@ dependencies:
   flutter_secure_storage: ^11.0.0
   torch_light: ^1.1.0
   wakelock_plus: ^1.7.0
+  permission_handler: ^13.0.0
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +61,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -108,3 +110,10 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/logo.jpg"
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: "assets/logo.jpg"
+  android_12:
+    color: "#FFFFFF"
+    image: "assets/logo.jpg"

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:torch_light/torch_light.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import '../core/theme.dart';
@@ -357,7 +358,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _dial(String number) async {
-    await FlutterPhoneDirectCaller.callNumber(number);
+    final status = await Permission.phone.request();
+    if (status.isGranted) {
+      await FlutterPhoneDirectCaller.callNumber(number);
+    } else {
+      final Uri phoneUri = Uri(scheme: 'tel', path: number);
+      if (await canLaunchUrl(phoneUri)) {
+        await launchUrl(phoneUri);
+      }
+    }
   }
 
   void _shareLiveLocation() async {
