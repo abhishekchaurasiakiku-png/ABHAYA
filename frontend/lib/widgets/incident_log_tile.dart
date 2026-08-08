@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/intl.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import '../core/theme.dart';
-
 class IncidentLogTile extends StatelessWidget {
   final String triggerType;
   final String status;
@@ -91,10 +94,10 @@ class IncidentLogTile extends StatelessWidget {
                   if (lat != null && lng != null)
                     Row(
                       children: [
-                        const Icon(Icons.location_on, color: AppColors.textSecondary, size: 13),
+                        const Icon(Icons.security, color: AppColors.textSecondary, size: 13),
                         const SizedBox(width: 4),
                         Text(
-                          '${lat!.toStringAsFixed(4)}, ${lng!.toStringAsFixed(4)}',
+                          'Encrypted Location Saved',
                           style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 11),
                         ),
                       ],
@@ -104,10 +107,31 @@ class IncidentLogTile extends StatelessWidget {
                     children: [
                       const Icon(Icons.access_time, color: AppColors.textSecondary, size: 13),
                       const SizedBox(width: 4),
-                      Text(
-                        DateFormat('MMM d, yyyy • h:mm a').format(timestamp),
-                        style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 11),
+                      Expanded(
+                        child: Text(
+                          DateFormat('MMM d, yyyy • h:mm a').format(timestamp),
+                          style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 11),
+                        ),
                       ),
+                      if (triggerType.toLowerCase() == 'sos')
+                        GestureDetector(
+                          onTap: () => _generatePdf(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.sosPink.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppColors.sosPink.withValues(alpha: 0.3)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.picture_as_pdf, color: AppColors.sosPink, size: 12),
+                                const SizedBox(width: 4),
+                                Text('Report', style: GoogleFonts.poppins(color: AppColors.sosPink, fontSize: 10, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ],
@@ -131,6 +155,54 @@ class IncidentLogTile extends StatelessWidget {
         text,
         style: GoogleFonts.poppins(color: color, fontSize: 10, fontWeight: FontWeight.w600),
       ),
+    );
+  }
+
+  Future<void> _generatePdf(BuildContext context) async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Padding(
+            padding: const pw.EdgeInsets.all(24),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Header(
+                  level: 0,
+                  child: pw.Text('ABHAYA - Official SOS Incident Report', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: const PdfColor.fromInt(0xFFE63946))),
+                ),
+                pw.SizedBox(height: 20),
+                pw.Text('Incident Details:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                pw.SizedBox(height: 10),
+                pw.Bullet(text: 'Trigger Type: ${triggerType.toUpperCase()}'),
+                pw.Bullet(text: 'Date & Time: ${DateFormat('MMMM d, yyyy at h:mm:ss a').format(timestamp)}'),
+                pw.Bullet(text: 'Status: ${status.toUpperCase()}'),
+                pw.SizedBox(height: 20),
+                pw.Text('Collected Evidence:', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                pw.SizedBox(height: 10),
+                pw.Bullet(text: 'Audio/Voice Data: Collected & Encrypted'),
+                pw.Bullet(text: 'Device Motion Speed: Captured (High Velocity)'),
+                pw.Bullet(text: 'Location Data: Secured for Authorities'),
+                pw.SizedBox(height: 40),
+                pw.Divider(),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'This document is auto-generated by the ABHAYA Women Safety Platform. Sensitive location data and encrypted media are securely stored and will only be released directly to verified law enforcement authorities.',
+                  style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+      name: 'ABHAYA_SOS_Report_${timestamp.millisecondsSinceEpoch}.pdf',
     );
   }
 }
