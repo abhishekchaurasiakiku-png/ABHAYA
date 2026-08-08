@@ -182,7 +182,9 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
             children: [
               const Icon(Icons.warning, color: Colors.amber, size: 28),
               const SizedBox(width: 10),
-              Text('Route Deviation', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text('Route Deviation', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+              ),
             ],
           ),
           content: Text(
@@ -301,7 +303,7 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
                       ),
                       child: Text(
                         'AI Route Monitor Active. We are watching your back.',
-                        style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 13),
+                        style: GoogleFonts.poppins(color: Colors.white, fontSize: 13),
                         textAlign: TextAlign.center,
                       ),
                     ),
