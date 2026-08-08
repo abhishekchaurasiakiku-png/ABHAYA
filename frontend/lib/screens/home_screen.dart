@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(
                           'Hello, $_userName ✨',
                           style: GoogleFonts.poppins(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Expanded(
                               child: Text(
                                 'Shield Active & Monitoring',
-                                style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 13),
+                                style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 13),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -163,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 10),
                           Text(
                             'You Are Never\nAlone',
-                            style: GoogleFonts.poppins(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, height: 1.2),
+                            style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold, height: 1.2),
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -220,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   QuickActionButton(
                     icon: Icons.flashlight_on,
                     label: _isTorchOn ? 'Flash Off' : 'Flashlight',
-                    iconColor: _isTorchOn ? Colors.white : AppColors.neonPurple.withValues(alpha: 0.7),
+                    iconColor: _isTorchOn ? AppColors.sosPink : AppColors.neonPurple.withValues(alpha: 0.7),
                     onTap: _toggleFlashlight,
                   ),
                 ],
@@ -230,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Safety Toolkit
               Text(
                 'Safety Toolkit',
-                style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 14),
               GridView(
@@ -334,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Text(
                                 _currentTip['title']!,
-                                style: GoogleFonts.poppins(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                                style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w600),
                               ),
                               const SizedBox(height: 4),
                               Text(

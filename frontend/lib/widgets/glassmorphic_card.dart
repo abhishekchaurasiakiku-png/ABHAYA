@@ -32,30 +32,25 @@ class GlassmorphicCard extends StatelessWidget {
         width: width,
         height: height,
         margin: margin ?? const EdgeInsets.symmetric(horizontal: 0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(borderRadius),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: padding ?? const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(borderRadius),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.surface.withValues(alpha: 0.8),
-                    AppColors.cardDark.withValues(alpha: 0.6),
-                  ],
-                ),
-                border: Border.all(
-                  color: borderColor ?? AppColors.cardBorder.withValues(alpha: 0.6),
-                  width: 1,
-                ),
+        child: Container(
+          padding: padding ?? const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(borderRadius),
+            color: AppColors.background,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.cardBorder.withValues(alpha: 0.8),
+                blurRadius: 15,
+                spreadRadius: 2,
+                offset: const Offset(0, 4),
               ),
-              child: child,
+            ],
+            border: Border.all(
+              color: AppColors.cardBorder.withValues(alpha: 0.5),
+              width: 1,
             ),
           ),
+          child: child,
         ),
       ),
     );

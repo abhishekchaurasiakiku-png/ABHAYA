@@ -16,7 +16,7 @@ class AbhayaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'A.B.H.A.Y.A',
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       initialRoute: '/',
       routes: AppRoutes.routes,
       debugShowCheckedModeBanner: false,

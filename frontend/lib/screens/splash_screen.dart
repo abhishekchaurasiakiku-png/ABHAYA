@@ -83,13 +83,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.shield, color: Colors.white, size: 50),
+                        child: const Icon(Icons.shield, color: AppColors.textPrimary, size: 50),
                       ),
                       const SizedBox(height: 24),
                       Text(
                         'A.B.H.A.Y.A',
                         style: GoogleFonts.poppins(
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 3,

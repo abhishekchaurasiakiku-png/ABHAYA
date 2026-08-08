@@ -69,10 +69,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: AppColors.background,
           title: Text(
             isEdit ? 'Edit Contact' : 'Add Contact',
-            style: GoogleFonts.poppins(color: Colors.white),
+            style: GoogleFonts.poppins(color: AppColors.textPrimary),
           ),
           content: SingleChildScrollView(
             child: Column(
@@ -80,28 +80,28 @@ class _ContactsScreenState extends State<ContactsScreen> {
               children: [
                 TextField(
                   controller: nameController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textPrimary),
                   decoration: const InputDecoration(
                     labelText: 'Name',
-                    labelStyle: TextStyle(color: Colors.white54),
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
                   ),
                 ),
                 TextField(
                   controller: phoneController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textPrimary),
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(
                     labelText: 'Phone',
-                    labelStyle: TextStyle(color: Colors.white54),
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
                   ),
                 ),
                 TextField(
                   controller: emailController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textPrimary),
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email (for alerts)',
-                    labelStyle: TextStyle(color: Colors.white54),
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
                   ),
                 ),
               ],
@@ -110,7 +110,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
             ),
             if (isEdit)
               TextButton(
@@ -153,9 +153,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Trusted Guardians', style: GoogleFonts.poppins()),
+        title: Text('Trusted Guardians', style: GoogleFonts.poppins(color: AppColors.textPrimary)),
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
@@ -164,9 +164,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
           : _contacts.isEmpty
               ? Center(
                   child: Text(
-                    'No contacts added yet.\nAdd someone you trust!',
+                    'No trusted contacts added yet.',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(color: Colors.white54),
+                    style: GoogleFonts.poppins(color: AppColors.textSecondary),
                   ),
                 )
               : ListView.builder(
@@ -177,9 +177,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E293B),
+                        color: AppColors.cardDark,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white.withOpacity(0.05)),
+                        border: Border.all(color: AppColors.cardBorder.withOpacity(0.5)),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
@@ -199,14 +199,14 @@ class _ContactsScreenState extends State<ContactsScreen> {
                             ),
                           ),
                           child: const CircleAvatar(
-                            backgroundColor: Color(0xFF0F172A),
-                            child: Icon(Icons.person, color: Colors.white70),
+                            backgroundColor: AppColors.background,
+                            child: Icon(Icons.person, color: AppColors.textSecondary),
                           ),
                         ),
                         title: Text(
                           contact['name'] ?? 'Unknown',
                           style: GoogleFonts.poppins(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
                           ),
@@ -216,7 +216,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                           style: GoogleFonts.poppins(color: Colors.greenAccent, fontSize: 12),
                         ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.white54),
+                          icon: const Icon(Icons.edit, color: AppColors.textSecondary),
                           onPressed: () => _showAddContactDialog(editIndex: index),
                         ),
                       ),
@@ -242,7 +242,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           onPressed: () => _showAddContactDialog(),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: const Icon(Icons.person_add_alt_1, color: Colors.white),
+          child: const Icon(Icons.person_add_alt_1, color: AppColors.textPrimary),
         ),
       ),
     );

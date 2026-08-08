@@ -74,12 +74,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         BoxShadow(color: AppColors.neonPurple.withValues(alpha: 0.3), blurRadius: 20),
                       ],
                     ),
-                    child: const Icon(Icons.shield, color: Colors.white, size: 40),
+                    child: const Icon(Icons.shield, color: AppColors.textPrimary, size: 40),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     _isLogin ? 'Welcome Back' : 'Create Account',
-                    style: GoogleFonts.poppins(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 26, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 6),
@@ -123,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: _isLoading
                         ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                         : Text(
-                            _isLogin ? 'LOGIN' : 'REGISTER',
+                            _isLogin ? 'Login' : 'Sign Up',
                             style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 1),
                           ),
                   ),
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return TextField(
       controller: controller,
       obscureText: obscure,
-      style: GoogleFonts.poppins(color: Colors.white),
+      style: GoogleFonts.poppins(color: AppColors.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.poppins(color: AppColors.textSecondary),

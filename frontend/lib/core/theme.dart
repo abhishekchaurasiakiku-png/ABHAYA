@@ -2,24 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color background = Color(0xFF120E1F);
-  static const Color surface = Color(0xFF1C152B);
-  static const Color cardDark = Color(0xFF251C37);
-  static const Color cardBorder = Color(0xFF4A3B69);
+  static const Color background = Color(0xFFFFFFFF);
+  static const Color surface = Color(0xFFF8F7FA);
+  static const Color cardDark = Color(0xFFF0EBF5);
+  static const Color cardBorder = Color(0xFFE5DEED);
   static const Color sosPink = Color(0xFFFF3366);
   static const Color neonCyan = Color(0xFF00E5FF); // Kept for legacy/minor accents if needed
   static const Color neonPurple = Color(0xFF9D4EDD);
   static const Color neonGreen = Color(0xFF00E676);
   static const Color accentPink = Color(0xFFFF758F);
-  static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Color(0xFFA594BD);
-  static const Color navBar = Color(0xFF120E1F);
+  static const Color textPrimary = Color(0xFF251C37); // Dark purple for contrast
+  static const Color textSecondary = Color(0xFF7A6A92); // Muted purple for secondary text
+  static const Color navBar = Color(0xFFFFFFFF);
 }
 
 class AppTheme {
-  static ThemeData get darkTheme {
+  static ThemeData get lightTheme {
     return ThemeData(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       primaryColor: AppColors.sosPink,
       scaffoldBackgroundColor: AppColors.background,
       appBarTheme: AppBarTheme(
@@ -27,19 +27,19 @@ class AppTheme {
         elevation: 0,
         centerTitle: false,
         titleTextStyle: GoogleFonts.poppins(
-          color: Colors.white,
+          color: AppColors.textPrimary,
           fontSize: 22,
           fontWeight: FontWeight.w600,
           letterSpacing: 1,
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
-      colorScheme: const ColorScheme.dark(
+      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme),
+      colorScheme: const ColorScheme.light(
         primary: AppColors.sosPink,
-        secondary: AppColors.neonCyan,
+        secondary: AppColors.neonPurple,
         surface: AppColors.surface,
-        onSurface: Colors.white,
+        onSurface: AppColors.textPrimary,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.navBar,

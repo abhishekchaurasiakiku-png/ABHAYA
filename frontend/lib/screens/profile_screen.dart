@@ -109,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Guardian Profile ✨', style: GoogleFonts.poppins(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              Text('Guardian Profile ✨', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold)),
               Text('Personalized Security & Live AI Detection Sensors', style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12)),
               const SizedBox(height: 20),
 
@@ -141,12 +141,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Center(
                                 child: Text(
                                   _name.isNotEmpty ? _name[0].toUpperCase() : 'U',
-                                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                                  style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
                                 ),
                               ),
                             if (_isUploading)
                               const Center(
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                child: CircularProgressIndicator(color: AppColors.neonPurple, strokeWidth: 2),
                               ),
                             Positioned(
                               bottom: 0,
@@ -169,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(_name, style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text(_name, style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
                           Row(
                             children: [
                               const Icon(Icons.email_outlined, color: AppColors.textSecondary, size: 13),
@@ -224,7 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text('Emergency & Medical Details', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                      child: Text('Emergency & Medical Details', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
                     ),
                     const SizedBox(width: 8),
                     const Icon(Icons.edit, color: AppColors.accentPink, size: 16),
@@ -327,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+              Text(title, style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
               Text(
                 subtitle,

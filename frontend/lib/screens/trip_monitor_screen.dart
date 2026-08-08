@@ -40,7 +40,7 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
       if (mounted) {
         Navigator.pop(context); // Close alert
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Auto-SOS Triggered due to route deviation!', style: TextStyle(color: Colors.white)), backgroundColor: AppColors.sosPink),
+          const SnackBar(content: Text('Auto-SOS Triggered due to route deviation!', style: TextStyle(color: AppColors.textPrimary)), backgroundColor: AppColors.sosPink),
         );
       }
     };
@@ -117,7 +117,7 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
             children: [
               const Icon(Icons.warning, color: Colors.amber, size: 28),
               const SizedBox(width: 10),
-              Text('Route Deviation', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text('Route Deviation', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
             ],
           ),
           content: Text(
@@ -213,7 +213,7 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
                     onPressed: _toggleTrip,
                     child: Text(
                       _isMonitoring ? 'Stop Monitoring Trip' : 'Start Safe Commute',
-                      style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -231,7 +231,7 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
                       ),
                       child: Text(
                         'AI Route Monitor Active. We are watching your back.',
-                        style: GoogleFonts.poppins(color: Colors.white, fontSize: 13),
+                        style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 13),
                         textAlign: TextAlign.center,
                       ),
                     ),

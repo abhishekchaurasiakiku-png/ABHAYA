@@ -127,7 +127,7 @@ class _MapScreenState extends State<MapScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Live Safety Map ✨', style: GoogleFonts.poppins(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                      Text('Live Safety Map ✨', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold)),
                       Text('Real-Time Geofence & Threat Analytics', style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12)),
                     ],
                   ),
@@ -223,7 +223,7 @@ class _MapScreenState extends State<MapScreen> {
                                           ),
                                           child: Text(
                                             station.name.length > 15 ? '${station.name.substring(0, 15)}...' : station.name,
-                                            style: GoogleFonts.poppins(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                            style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 10, fontWeight: FontWeight.bold),
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
@@ -252,7 +252,7 @@ class _MapScreenState extends State<MapScreen> {
                           children: [
                             Icon(Icons.shield, color: _riskColor, size: 14),
                             const SizedBox(width: 6),
-                            Text(_geofenceLabel, style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                            Text(_geofenceLabel, style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 11, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),
@@ -298,7 +298,7 @@ class _MapScreenState extends State<MapScreen> {
               // Safety Analysis
               Row(
                 children: [
-                  Text('Local Area Safety Analysis ', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('Local Area Safety Analysis ', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
                   const Icon(Icons.verified_user, color: AppColors.accentPink, size: 20),
                 ],
               ),
@@ -320,7 +320,7 @@ class _MapScreenState extends State<MapScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Overall Area Risk Score', style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12)),
-                        Text(_riskLabel, style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(_riskLabel, style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ],

@@ -78,7 +78,7 @@ class _IncidentHistoryScreenState extends State<IncidentHistoryScreen> {
                               children: [
                                 Text(
                                   type,
-                                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

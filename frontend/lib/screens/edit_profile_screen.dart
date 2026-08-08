@@ -77,8 +77,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        title: Text('Edit Profile', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text('Edit Profile', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: AppColors.neonCyan))
@@ -134,7 +134,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         controller: controller,
         maxLines: maxLines,
         keyboardType: keyboardType,
-        style: GoogleFonts.poppins(color: Colors.white),
+        style: GoogleFonts.poppins(color: AppColors.textPrimary),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: GoogleFonts.poppins(color: AppColors.textSecondary),

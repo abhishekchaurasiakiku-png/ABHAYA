@@ -78,7 +78,7 @@ class _SupportScreenState extends State<SupportScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Support & Helplines ✨', style: GoogleFonts.poppins(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              Text('Support & Helplines ✨', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold)),
               Text('Immediate National Helplines & AI Security Logs', style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12)),
               const SizedBox(height: 20),
 
@@ -86,7 +86,7 @@ class _SupportScreenState extends State<SupportScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: Text("24/7 Rapid Response Helplines ", style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text("24/7 Rapid Response Helplines ", style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                   const Icon(Icons.phone, color: AppColors.accentPink, size: 18),
                 ],
@@ -116,7 +116,7 @@ class _SupportScreenState extends State<SupportScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: Text('AI Protection Activity Logs ', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Text('AI Protection Activity Logs ', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                   const Icon(Icons.description, color: Colors.amber, size: 18),
                 ],

@@ -144,7 +144,7 @@ class _MainShellState extends State<MainShell> {
         margin: const EdgeInsets.only(top: 20),
         child: FloatingActionButton(
           onPressed: _triggerSos,
-          backgroundColor: _isSosActive ? Colors.red[900] : AppColors.sosPink,
+          backgroundColor: _isSosActive ? AppColors.neonPurple : AppColors.sosPink,
           elevation: _isSosActive ? 12 : 8,
           shape: const CircleBorder(),
           child: _isSosActive 
@@ -152,7 +152,7 @@ class _MainShellState extends State<MainShell> {
             : Text(
                 'SOS',
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: Colors.white, // Keep white on the vibrant pink button
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -160,21 +160,33 @@ class _MainShellState extends State<MainShell> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        color: AppColors.navBar,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8,
-        padding: EdgeInsets.zero,
-        height: 60,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.home, 'Home', 0),
-            _buildNavItem(Icons.map, 'Map', 1),
-            const SizedBox(width: 48), // Space for FAB
-            _buildNavItem(Icons.support_agent, 'Support', 3),
-            _buildNavItem(Icons.person, 'Profile', 4),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.textSecondary.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
           ],
+        ),
+        child: BottomAppBar(
+          color: AppColors.navBar,
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 8,
+          padding: EdgeInsets.zero,
+          height: 60,
+          elevation: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(Icons.home, 'Home', 0),
+              _buildNavItem(Icons.map, 'Map', 1),
+              const SizedBox(width: 48), // Space for FAB
+              _buildNavItem(Icons.support_agent, 'Support', 3),
+              _buildNavItem(Icons.person, 'Profile', 4),
+            ],
+          ),
         ),
       ),
     );
