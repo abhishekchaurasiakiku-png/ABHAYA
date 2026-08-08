@@ -120,6 +120,7 @@ class ShakeDetectionService {
         initialNotificationTitle: 'ABHAYA Safety Guard Active',
         initialNotificationContent: 'Monitoring for SOS gestures',
         foregroundServiceNotificationId: 888,
+        foregroundServiceTypes: [AndroidForegroundType.location],
       ),
       iosConfiguration: IosConfiguration(
         autoStart: true,
