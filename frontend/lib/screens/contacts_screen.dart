@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/user_service.dart';
+import '../core/constants.dart';
+import '../core/theme.dart';
 
 class ContactsScreen extends StatefulWidget {
   const ContactsScreen({super.key});
@@ -80,7 +82,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
               children: [
                 TextField(
                   controller: nameController,
-                  style: const TextStyle(color: AppColors.textPrimary),
+                  style: TextStyle(color: AppColors.textPrimary),
                   decoration: const InputDecoration(
                     labelText: 'Name',
                     labelStyle: TextStyle(color: AppColors.textSecondary),
@@ -88,7 +90,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 ),
                 TextField(
                   controller: phoneController,
-                  style: const TextStyle(color: AppColors.textPrimary),
+                  style: TextStyle(color: AppColors.textPrimary),
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(
                     labelText: 'Phone',
@@ -97,7 +99,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 ),
                 TextField(
                   controller: emailController,
-                  style: const TextStyle(color: AppColors.textPrimary),
+                  style: TextStyle(color: AppColors.textPrimary),
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email (for alerts)',
@@ -110,7 +112,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+              child: Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
             ),
             if (isEdit)
               TextButton(
@@ -216,7 +218,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                           style: GoogleFonts.poppins(color: Colors.greenAccent, fontSize: 12),
                         ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.edit, color: AppColors.textSecondary),
+                          icon: Icon(Icons.edit, color: AppColors.textSecondary),
                           onPressed: () => _showAddContactDialog(editIndex: index),
                         ),
                       ),
@@ -242,7 +244,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
           onPressed: () => _showAddContactDialog(),
           backgroundColor: Colors.transparent,
           elevation: 0,
-          child: const Icon(Icons.person_add_alt_1, color: AppColors.textPrimary),
+          child: Icon(Icons.person_add_alt_1, color: AppColors.textPrimary),
         ),
       ),
     );
