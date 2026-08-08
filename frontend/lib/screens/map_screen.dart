@@ -277,9 +277,9 @@ class _MapScreenState extends State<MapScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.radar, color: Colors.white, size: 20),
+                      const Icon(Icons.radar, color: AppColors.textPrimary, size: 20),
                       const SizedBox(width: 8),
-                      Text('Scan for Nearby Police Stations', style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text('Scan for Nearby Police Stations', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
