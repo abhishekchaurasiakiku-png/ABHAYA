@@ -36,19 +36,12 @@ const generateEmailHtml = (user, type, triggerType, mapsUrl) => {
   `;
 };
 
-/**
- * POST /api/sos/trigger
- * 
- * Receives SOS alert, creates incident, and dispatches FCM
- * notifications to guardians. Target: < 2 seconds total latency.
- */
 exports.triggerSos = async (req, res) => {
   const startTime = Date.now();
 
   try {
     const { triggerType, location, timestamp, contactPhones } = req.body;
 
-    // Create incident
     const incident = new Incident({
       userId: req.userId,
       triggerType,
@@ -57,13 +50,11 @@ exports.triggerSos = async (req, res) => {
       status: 'Active',
     });
 
-    // Save incident and fetch user data in parallel for speed
     const [savedIncident, user] = await Promise.all([
       incident.save(),
       User.findById(req.userId),
     ]);
 
-    // Dispatch notifications to emergency contacts
     if (user && user.emergencyContacts.length > 0) {
       const mapsUrl = location?.coordinates
         ? `https://maps.google.com/?q=${location.coordinates[1]},${location.coordinates[0]}`
@@ -75,7 +66,6 @@ exports.triggerSos = async (req, res) => {
       for (const contact of user.emergencyContacts) {
         if (!contact.notifyOnSos) continue;
         
-        // FCM push
         if (contact.fcmToken) {
           sendSosNotification(contact.fcmToken, {
             userName: user.name,
@@ -85,18 +75,15 @@ exports.triggerSos = async (req, res) => {
           }).catch(err => console.error('[SOS] FCM failed for contact:', err.message));
         }
         
-        // SMS
         if (contact.phone) {
           sendSosSms(contact.phone, smsMessage);
         }
         
-        // Email
         if (contact.email) {
           sendSosEmail(contact.email, `URGENT: SOS Alert from ${user.name}`, emailHtml);
         }
       }
 
-      // Log notified contacts
       savedIncident.notifiedContacts = user.emergencyContacts
         .filter(c => c.notifyOnSos)
         .map(c => ({
@@ -125,9 +112,6 @@ exports.triggerSos = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/sos/:id/resolve
- */
 exports.resolveSos = async (req, res) => {
   try {
     const { status, resolvedAt, notes } = req.body;
@@ -154,10 +138,6 @@ exports.resolveSos = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/sos/:id/location
- * Updates real-time location for an active SOS
- */
 exports.updateLocation = async (req, res) => {
   try {
     const { coordinates } = req.body; // [lng, lat]
@@ -185,9 +165,6 @@ exports.updateLocation = async (req, res) => {
   }
 };
 
-/**
- * GET /api/sos/active
- */
 exports.getActiveSos = async (req, res) => {
   try {
     const incidents = await Incident.find({
@@ -201,10 +178,6 @@ exports.getActiveSos = async (req, res) => {
   }
 };
 
-/**
- * POST /api/sos/share-location
- * Send live location to trusted contacts without triggering SOS
- */
 exports.shareLiveLocation = async (req, res) => {
   try {
     const { location } = req.body;

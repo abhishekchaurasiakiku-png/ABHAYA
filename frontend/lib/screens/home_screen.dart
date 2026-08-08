@@ -74,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _recordEvidence() async {
     final picker = ImagePicker();
     await picker.pickVideo(source: ImageSource.camera);
-    // In a real app, this video would be saved/uploaded securely
   }
 
   @override
@@ -248,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  mainAxisExtent: 130, // Fixed height to prevent overflow
+                  mainAxisExtent: 130,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
                 ),
@@ -272,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Safety Zone',
                     subtitle: 'Geofence all-clear',
                     iconColor: AppColors.neonPurple,
-                    onTap: () => Navigator.pushNamed(context, '/main'), // Assumes tab change or map screen
+                    onTap: () => Navigator.pushNamed(context, '/main'),
                   ),
                   SafetyToolkitTile(
                     icon: Icons.directions_walk,
@@ -284,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         MaterialPageRoute(builder: (context) => const TripMonitorScreen()),
                       );
-                    }, // Routing to Safe Commute UI
+                    },
                   ),
                   SafetyToolkitTile(
                     icon: Icons.local_police,
@@ -418,11 +417,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _findPoliceStation() {
-    // Navigate to MapScreen which will handle its own Police Station rendering now.
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const Scaffold(
-        appBar: null, // Let MapScreen use safe area
+        appBar: null,
         body: MapScreen(),
       )),
     );

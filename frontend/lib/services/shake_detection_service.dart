@@ -27,8 +27,7 @@ void onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  // Configurable thresholds for background detection (optimized for speed)
-  double shakeThresholdGravity = 2.0; // Lowered to trigger faster with normal shakes
+  double shakeThresholdGravity = 2.0;
   int minimumShakes = 3;
   Duration timeWindow = const Duration(seconds: 2);
 
@@ -60,11 +59,9 @@ void onStart(ServiceInstance service) async {
         shakeTimestamps.clear();
         isProcessingSos = true;
         
-        // Let the UI know it was triggered
         service.invoke('sos_triggered');
 
         try {
-          // Add a strict timeout to location fetch so SOS isn't delayed if GPS is slow indoors
           final position = await locationService.getCurrentLocation().timeout(
             const Duration(seconds: 2), 
             onTimeout: () => null,
@@ -96,7 +93,6 @@ class ShakeDetectionService {
   Future<void> initializeBackgroundService(GlobalKey<NavigatorState> navigatorKey) async {
     final service = FlutterBackgroundService();
     
-    // Notifications required for Android Foreground Service
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'abhaya_safety_channel',
       'ABHAYA Safety Service',
@@ -106,7 +102,6 @@ class ShakeDetectionService {
 
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     
-    // Handle permissions on Android 13+
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
@@ -130,14 +125,13 @@ class ShakeDetectionService {
         autoStart: true,
         onForeground: onStart,
         onBackground: (ServiceInstance service) {
-          return true; // iOS background handler
+          return true;
         },
       ),
     );
 
     service.startService();
 
-    // Listen to background isolate trigger to update UI
     service.on('sos_triggered').listen((event) {
       if (navigatorKey.currentState != null) {
         navigatorKey.currentState!.pushNamed('/sos_activated');

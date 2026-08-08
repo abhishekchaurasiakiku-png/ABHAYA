@@ -1,8 +1,6 @@
 const User = require('../models/User');
 
-/**
- * GET /api/users/profile
- */
+
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -13,9 +11,7 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/users/profile
- */
+
 exports.updateProfile = async (req, res) => {
   try {
     const { name, phone, profileImage, bloodGroup, medicalDetails, homeAddress, workAddress } = req.body;
@@ -40,9 +36,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/users/contacts
- */
+
 exports.updateContacts = async (req, res) => {
   try {
     const { emergencyContacts } = req.body;
@@ -58,9 +52,7 @@ exports.updateContacts = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/users/ai-settings
- */
+
 exports.updateAiSettings = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
@@ -75,12 +67,7 @@ exports.updateAiSettings = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/users/fcm-token
- *
- * Register/update the user's FCM device token for push notifications.
- * Called by the Flutter app after obtaining the FCM token.
- */
+
 exports.updateFcmToken = async (req, res) => {
   try {
     const { fcmToken } = req.body;
@@ -96,17 +83,13 @@ exports.updateFcmToken = async (req, res) => {
   }
 };
 
-/**
- * POST /api/users/profile-image
- * Uploads a profile image and updates the user's profileImage field.
- */
+
 exports.uploadProfileImage = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file uploaded' });
     }
 
-    // Construct the public URL path
     const imageUrl = `/uploads/${req.file.filename}`;
 
     const user = await User.findByIdAndUpdate(

@@ -2,15 +2,10 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const config = require('../config/env');
 
-/**
- * Helper to safely sanitize and validate timespan strings from environment variables
- * (strips extraneous quotes/whitespace, defaults if invalid).
- */
 const getExpiry = (envVal, fallback) => {
   if (!envVal) return fallback;
   const cleaned = String(envVal).trim().replace(/^["']|["']$/g, '');
   try {
-    // Test if jsonwebtoken accepts this timespan format without throwing
     jwt.sign({ test: 1 }, 'test-secret', { expiresIn: cleaned });
     return cleaned;
   } catch (err) {
@@ -19,9 +14,6 @@ const getExpiry = (envVal, fallback) => {
   }
 };
 
-/**
- * Generate JWT access and refresh tokens.
- */
 const generateTokens = (userId) => {
   const secret = config.jwt.secret;
   const accessExpiry = getExpiry(config.jwt.expiresIn, '7d');
@@ -42,25 +34,19 @@ const generateTokens = (userId) => {
   return { token, refreshToken };
 };
 
-/**
- * POST /api/auth/register
- */
 exports.register = async (req, res) => {
   try {
     const { name, phone, email, password } = req.body;
 
-    // Validate required fields
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email, and password are required' });
     }
 
-    // Check if email already exists
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
-    // Create user — passwordHash will be hashed by pre-save hook
     const user = new User({
       name,
       phone: phone || '',
@@ -68,15 +54,10 @@ exports.register = async (req, res) => {
       passwordHash: password,
     });
 
-    // Save user (first save: hashes password and creates user in DB)
     await user.save();
 
-    // Generate tokens using the saved user's _id
     const { token, refreshToken } = generateTokens(user._id);
 
-    // Update only the refreshToken field using findByIdAndUpdate
-    // to avoid triggering the pre-save hook again (prevents any
-    // chance of double-hashing the password)
     await User.findByIdAndUpdate(user._id, { refreshToken });
 
     console.log(`[Auth] User registered successfully: ${user.email}`);
@@ -89,12 +70,10 @@ exports.register = async (req, res) => {
   } catch (err) {
     console.error('[Auth] Register error:', err.message, err.stack);
 
-    // Handle MongoDB duplicate key error
     if (err.code === 11000) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
-    // Handle validation errors
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(e => e.message);
       return res.status(400).json({ error: messages.join(', ') });
@@ -104,14 +83,10 @@ exports.register = async (req, res) => {
   }
 };
 
-/**
- * POST /api/auth/login
- */
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate required fields
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
@@ -128,10 +103,8 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Generate tokens
     const { token, refreshToken } = generateTokens(user._id);
 
-    // Update refreshToken without triggering pre-save hook
     await User.findByIdAndUpdate(user._id, { refreshToken });
 
     console.log(`[Auth] User logged in: ${user.email}`);
@@ -147,9 +120,6 @@ exports.login = async (req, res) => {
   }
 };
 
-/**
- * POST /api/auth/refresh
- */
 exports.refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -167,7 +137,6 @@ exports.refreshToken = async (req, res) => {
 
     const tokens = generateTokens(user._id);
 
-    // Update refreshToken without triggering pre-save hook
     await User.findByIdAndUpdate(user._id, { refreshToken: tokens.refreshToken });
 
     res.json(tokens);
