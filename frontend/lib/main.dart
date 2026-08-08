@@ -20,18 +20,14 @@ class AbhayaApp extends StatefulWidget {
 }
 
 class _AbhayaAppState extends State<AbhayaApp> {
-  late ShakeDetectionService _shakeService;
-
   @override
   void initState() {
     super.initState();
-    _shakeService = ShakeDetectionService(navigatorKey: globalNavigatorKey);
-    _shakeService.startListening();
+    ShakeDetectionService().initializeBackgroundService(globalNavigatorKey);
   }
 
   @override
   void dispose() {
-    _shakeService.stopListening();
     super.dispose();
   }
 

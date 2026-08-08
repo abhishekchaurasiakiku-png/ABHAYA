@@ -285,12 +285,76 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              
               if (_isRouting)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 12.0),
                   child: Center(child: CircularProgressIndicator(color: AppColors.neonPurple)),
                 ),
+
+              if (_policeStations.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text('Nearby Police Stations', style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                ..._policeStations.map((station) {
+                  // Assuming driving speed 40km/h (approx 11.1 m/s)
+                  final double speedMS = 11.1; 
+                  final int estimatedSeconds = (station.distance / speedMS).round();
+                  final String timeString = estimatedSeconds < 60 
+                    ? '$estimatedSeconds sec' 
+                    : '${(estimatedSeconds / 60).toStringAsFixed(1)} min';
+                    
+                  return GestureDetector(
+                    onTap: () {
+                       _calculateRouteTo(station.location);
+                       _mapController.move(station.location, 16);
+                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Routing to: ${station.name}')));
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardDark.withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.neonPurple.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.withValues(alpha: 0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.local_police, color: Colors.blue, size: 24),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(station.name, style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w600)),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.route, color: AppColors.textSecondary, size: 12),
+                                    const SizedBox(width: 4),
+                                    Text('${(station.distance / 1000).toStringAsFixed(1)} km away', style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12)),
+                                    const SizedBox(width: 12),
+                                    const Icon(Icons.timer, color: AppColors.textSecondary, size: 12),
+                                    const SizedBox(width: 4),
+                                    Text('Est. $timeString', style: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 12)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.navigation, color: AppColors.neonPurple),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ],
                 
               // (Removed old AI button as the scanning button replaces it)
               const SizedBox(height: 24),

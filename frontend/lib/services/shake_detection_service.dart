@@ -1,118 +1,142 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'sos_service.dart';
 import 'location_service.dart';
 
-class ShakeDetectionService {
-  // Configurable thresholds
-  double shakeThresholdGravity = 2.7; // Magnitude of acceleration in Gs to count as a shake
-  int minimumShakes = 3; // Number of shakes required
-  Duration timeWindow = const Duration(seconds: 2); // Time window to achieve minimum shakes
-
-  final SosService _sosService = SosService();
-  final LocationService _locationService = LocationService();
+@pragma('vm:entry-point')
+void onStart(ServiceInstance service) async {
+  DartPluginRegistrant.ensureInitialized();
   
-  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
-  
-  List<DateTime> _shakeTimestamps = [];
-  bool _isProcessingSos = false;
-  
-  // A global navigator key must be provided to navigate to the SOS screen
-  final GlobalKey<NavigatorState> navigatorKey;
-
-  ShakeDetectionService({required this.navigatorKey});
-
-  void startListening() {
-    if (_accelerometerSubscription != null) return;
-    
-    _accelerometerSubscription = accelerometerEventStream().listen((AccelerometerEvent event) {
-      if (_isProcessingSos) return;
-      
-      // Calculate magnitude in Gs (Standard gravity is ~9.8 m/s^2)
-      double gX = event.x / 9.80665;
-      double gY = event.y / 9.80665;
-      double gZ = event.z / 9.80665;
-      
-      double gForce = sqrt(gX * gX + gY * gY + gZ * gZ);
-      
-      if (gForce > shakeThresholdGravity) {
-        _onShakeDetected();
-      }
+  if (service is AndroidServiceInstance) {
+    service.on('setAsForeground').listen((event) {
+      service.setAsForegroundService();
     });
-    
-    debugPrint("Shake detection started.");
+
+    service.on('setAsBackground').listen((event) {
+      service.setAsBackgroundService();
+    });
   }
 
-  void stopListening() {
-    _accelerometerSubscription?.cancel();
-    _accelerometerSubscription = null;
-    _shakeTimestamps.clear();
-    debugPrint("Shake detection stopped.");
-  }
+  service.on('stopService').listen((event) {
+    service.stopSelf();
+  });
 
-  void _onShakeDetected() {
-    final now = DateTime.now();
-    
-    // Remove old timestamps outside the window
-    _shakeTimestamps.removeWhere((timestamp) => 
-      now.difference(timestamp) > timeWindow
-    );
-    
-    // To prevent a single long motion from being counted as many shakes rapidly,
-    // ensure at least 200ms between counted shakes
-    if (_shakeTimestamps.isNotEmpty) {
-      if (now.difference(_shakeTimestamps.last) < const Duration(milliseconds: 200)) {
+  // Configurable thresholds for background detection
+  double shakeThresholdGravity = 2.7;
+  int minimumShakes = 3;
+  Duration timeWindow = const Duration(seconds: 2);
+
+  final SosService sosService = SosService();
+  final LocationService locationService = LocationService();
+  
+  List<DateTime> shakeTimestamps = [];
+  bool isProcessingSos = false;
+
+  accelerometerEventStream().listen((AccelerometerEvent event) async {
+    if (isProcessingSos) return;
+
+    double gX = event.x / 9.80665;
+    double gY = event.y / 9.80665;
+    double gZ = event.z / 9.80665;
+    double gForce = sqrt(gX * gX + gY * gY + gZ * gZ);
+
+    if (gForce > shakeThresholdGravity) {
+      final now = DateTime.now();
+      shakeTimestamps.removeWhere((timestamp) => now.difference(timestamp) > timeWindow);
+      
+      if (shakeTimestamps.isNotEmpty && now.difference(shakeTimestamps.last) < const Duration(milliseconds: 200)) {
         return;
       }
-    }
-    
-    _shakeTimestamps.add(now);
-    
-    if (_shakeTimestamps.length >= minimumShakes) {
-      _shakeTimestamps.clear();
-      _triggerSos();
-    }
-  }
-
-  Future<void> _triggerSos() async {
-    _isProcessingSos = true;
-    debugPrint("SHAKE PATTERN DETECTED! TRIGGERING SOS...");
-    
-    // Navigate immediately to SOS ACTIVATED screen so user sees feedback
-    if (navigatorKey.currentState != null) {
-      navigatorKey.currentState!.pushNamed('/sos_activated');
-    }
-
-    double lat = 0.0;
-    double lng = 0.0;
-    
-    try {
-      final position = await _locationService.getCurrentLocation();
-      lat = position?.latitude ?? 0.0;
-      lng = position?.longitude ?? 0.0;
-    } catch (e) {
-      debugPrint("Failed to get location for shake SOS");
-    }
-
-    try {
-      await _sosService.triggerSos(
-        triggerType: 'Motion',
-        latitude: lat,
-        longitude: lng,
-      );
       
-      // Open SMS as a fallback
-      await _sosService.openNativeSms(lat, lng, isSos: true);
+      shakeTimestamps.add(now);
       
-      // We do NOT reset _isProcessingSos here, so it doesn't re-trigger infinitely 
-      // while they are in the emergency state. They must restart the app or reset it.
-    } catch (e) {
-      debugPrint("Failed to send SOS: $e");
-      // Allow them to try shaking again if it failed
-      _isProcessingSos = false;
+      if (shakeTimestamps.length >= minimumShakes) {
+        shakeTimestamps.clear();
+        isProcessingSos = true;
+        
+        // Let the UI know it was triggered
+        service.invoke('sos_triggered');
+
+        try {
+          final position = await locationService.getCurrentLocation();
+          double lat = position?.latitude ?? 0.0;
+          double lng = position?.longitude ?? 0.0;
+          
+          await sosService.triggerSos(
+            triggerType: 'Motion (Background)',
+            latitude: lat,
+            longitude: lng,
+          );
+          
+          await sosService.openNativeSms(lat, lng, isSos: true);
+        } catch (e) {
+          debugPrint("Failed to send SOS in background: $e");
+          isProcessingSos = false;
+        }
+      }
     }
+  });
+}
+
+class ShakeDetectionService {
+  static final ShakeDetectionService _instance = ShakeDetectionService._internal();
+  factory ShakeDetectionService() => _instance;
+  ShakeDetectionService._internal();
+
+  Future<void> initializeBackgroundService(GlobalKey<NavigatorState> navigatorKey) async {
+    final service = FlutterBackgroundService();
+    
+    // Notifications required for Android Foreground Service
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'abhaya_safety_channel',
+      'ABHAYA Safety Service',
+      description: 'Constantly monitoring for emergency gestures',
+      importance: Importance.low,
+    );
+
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    
+    // Handle permissions on Android 13+
+    flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestNotificationsPermission();
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    await service.configure(
+      androidConfiguration: AndroidConfiguration(
+        onStart: onStart,
+        autoStart: true,
+        isForegroundMode: true,
+        notificationChannelId: 'abhaya_safety_channel',
+        initialNotificationTitle: 'ABHAYA Safety Guard Active',
+        initialNotificationContent: 'Monitoring for SOS gestures',
+        foregroundServiceNotificationId: 888,
+      ),
+      iosConfiguration: IosConfiguration(
+        autoStart: true,
+        onForeground: onStart,
+        onBackground: (ServiceInstance service) {
+          return true; // iOS background handler
+        },
+      ),
+    );
+
+    service.startService();
+
+    // Listen to background isolate trigger to update UI
+    service.on('sos_triggered').listen((event) {
+      if (navigatorKey.currentState != null) {
+        navigatorKey.currentState!.pushNamed('/sos_activated');
+      }
+    });
   }
 }
