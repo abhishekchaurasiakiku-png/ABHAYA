@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -7,6 +9,7 @@ import '../core/theme.dart';
 import '../services/location_service.dart';
 import '../services/map_service.dart';
 import '../services/trip_monitor_service.dart';
+import '../widgets/glassmorphic_card.dart';
 
 class TripMonitorScreen extends StatefulWidget {
   const TripMonitorScreen({super.key});
@@ -20,6 +23,9 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
   final MapService _mapService = MapService();
   final TripMonitorService _tripService = TripMonitorService();
   final MapController _mapController = MapController();
+
+  final TextEditingController _fromController = TextEditingController();
+  final TextEditingController _toController = TextEditingController();
 
   LatLng? _currentLocation;
   LatLng? _destination;
@@ -48,9 +54,68 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
 
   @override
   void dispose() {
+    _fromController.dispose();
+    _toController.dispose();
     _tripService.stopMonitoring();
     WakelockPlus.disable();
     super.dispose();
+  }
+
+  Future<LatLng?> _geocodeAddress(String address) async {
+    try {
+      final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(address)}&format=json&limit=1');
+      final response = await http.get(url, headers: {'User-Agent': 'com.abhaya.app'});
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data.isNotEmpty) {
+          return LatLng(double.parse(data[0]['lat']), double.parse(data[0]['lon']));
+        }
+      }
+    } catch (e) {
+      debugPrint("Geocode error: $e");
+    }
+    return null;
+  }
+
+  void _searchManualRoute() async {
+    if (_toController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a destination')));
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    LatLng? startPt;
+    if (_fromController.text.trim().isEmpty) {
+      startPt = _currentLocation;
+    } else {
+      startPt = await _geocodeAddress(_fromController.text.trim());
+    }
+
+    LatLng? endPt = await _geocodeAddress(_toController.text.trim());
+
+    if (startPt == null || endPt == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not find one of the locations')));
+        setState(() => _isLoading = false);
+      }
+      return;
+    }
+
+    final route = await _mapService.getRoute(startPt, endPt);
+    
+    if (mounted) {
+      setState(() {
+        _currentLocation = startPt;
+        _destination = endPt;
+        _routePoints = route;
+        _isLoading = false;
+        
+        if (_routePoints.isNotEmpty) {
+          _mapController.move(startPt!, 13);
+        }
+      });
+    }
   }
 
   void _loadInitialLocation() async {
@@ -163,7 +228,12 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
                   options: MapOptions(
                     initialCenter: _currentLocation ?? const LatLng(0, 0),
                     initialZoom: 15,
-                    onLongPress: _onMapLongPress,
+                    onLongPress: (tapPosition, point) {
+                      if (!_isMonitoring) {
+                        _onMapLongPress(tapPosition, point);
+                        _toController.text = "Dropped Pin";
+                      }
+                    },
                   ),
                   children: [
                     TileLayer(
@@ -233,6 +303,59 @@ class _TripMonitorScreenState extends State<TripMonitorScreen> {
                         'AI Route Monitor Active. We are watching your back.',
                         style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 13),
                         textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                else
+                  Positioned(
+                    top: 20,
+                    left: 20,
+                    right: 20,
+                    child: GlassmorphicCard(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: _fromController,
+                            style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
+                            decoration: InputDecoration(
+                              hintText: 'Current Location (or type address)',
+                              hintStyle: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 14),
+                              prefixIcon: const Icon(Icons.my_location, color: AppColors.neonCyan, size: 20),
+                              filled: true,
+                              fillColor: AppColors.background.withValues(alpha: 0.5),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: _toController,
+                            style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
+                            decoration: InputDecoration(
+                              hintText: 'Enter Destination',
+                              hintStyle: GoogleFonts.poppins(color: AppColors.textSecondary, fontSize: 14),
+                              prefixIcon: const Icon(Icons.location_on, color: AppColors.sosPink, size: 20),
+                              filled: true,
+                              fillColor: AppColors.background.withValues(alpha: 0.5),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.neonPurple,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              onPressed: _searchManualRoute,
+                              child: Text('Search Route', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
